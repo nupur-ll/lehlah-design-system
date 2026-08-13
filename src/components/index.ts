@@ -30,7 +30,7 @@ export { default as IconButton } from "./IconButton";
 export type { IconButtonProps } from "./IconButton";
 
 export { default as InputField } from "./InputField";
-export type { InputFieldProps, InputFieldType } from "./InputField";
+export type { InputFieldProps, InputFieldType, InputFieldState } from "./InputField";
 
 export { AffiliateLinkCard, CollectionCard, StatTile } from "./Card";
 export type { AffiliateLinkCardProps, AffiliateLinkCardType, CollectionCardProps, StatTileProps } from "./Card";

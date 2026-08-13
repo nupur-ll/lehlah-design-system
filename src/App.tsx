@@ -14,7 +14,7 @@ import {
   CollectionCard,
   BottomSheet,
 } from "./components";
-import type { ButtonVariant, PillType } from "./components";
+import type { ButtonVariant, PillType, InputFieldType, InputFieldState } from "./components";
 
 const BUTTON_VARIANTS: ButtonVariant[] = [
   "filled",
@@ -24,6 +24,17 @@ const BUTTON_VARIANTS: ButtonVariant[] = [
   "destructive",
   "success",
   "disabled",
+];
+
+// Mirrors STATES_BY_TYPE in InputField.tsx — the exact type x state matrix
+// that exists in the Figma file (not every type has all 5 states).
+const INPUT_FIELD_MATRIX: { type: InputFieldType; states: InputFieldState[] }[] = [
+  { type: "text-input", states: ["default", "focused", "filled", "error", "disabled"] },
+  { type: "action-input", states: ["default", "focused", "filled", "error"] },
+  { type: "dropdown-input", states: ["default", "focused", "filled", "error"] },
+  { type: "prefix-input", states: ["default", "focused", "filled", "error"] },
+  { type: "otp-input", states: ["default", "focused", "filled", "error"] },
+  { type: "search-input", states: ["default", "focused", "filled"] },
 ];
 
 const PILL_TYPES: PillType[] = [
@@ -39,6 +50,14 @@ const PILL_TYPES: PillType[] = [
   "error",
   "dark",
 ];
+
+function CaretIcon() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" className="size-full" aria-hidden>
+      <path d="M6 9l6 6 6-6" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
@@ -129,13 +148,46 @@ export default function App() {
         <Banner color="teal" weight="light" />
       </Section>
 
-      <Section title="Input field">
-        <div className="flex w-[358px] flex-col gap-4">
-          <InputField label="Input Label" placeholder="Input Text" />
-          <InputField label="Input Label" error="Input error message" mandatory />
-          <InputField type="search-input" label="" placeholder="Search here" />
+      <section className="flex flex-col gap-4 border-b border-solid border-[var(--color-grey-200)] py-8">
+        <h2 className="text-[length:var(--type-title-large-size)] font-bold text-[color:var(--typography-color-primary)]">
+          Input field
+        </h2>
+        <p className="max-w-2xl text-sm text-[color:var(--typography-color-secondary)]">
+          Every type × state combination that actually exists in the Figma file (node
+          724:1449) — 6 types, each gated to the states it really has. "default" is
+          label-only by design; the value line only appears once a field is focused,
+          filled, in error, or disabled.
+        </p>
+        <div className="flex flex-col gap-8">
+          {INPUT_FIELD_MATRIX.map(({ type, states }) => (
+            <div key={type} className="flex flex-col gap-2">
+              <h3 className="text-xs font-semibold uppercase tracking-[0.5px] text-[color:var(--typography-color-secondary)]">
+                {type}
+              </h3>
+              <div className="flex flex-wrap gap-4">
+                {states.map((state) => (
+                  <div key={state} className="flex w-[220px] flex-col gap-1">
+                    <span className="text-[11px] text-[color:var(--typography-color-secondary)]">
+                      {state}
+                    </span>
+                    <InputField
+                      type={type}
+                      state={state}
+                      label={type === "search-input" ? "Search here" : "Input Label"}
+                      value={state === "filled" || state === "error" ? "Input value" : undefined}
+                      otpValue={type === "otp-input" && (state === "filled" || state === "error") ? "192" : ""}
+                      error={state === "error" ? "Input error message" : undefined}
+                      disabled={state === "disabled"}
+                      options={type === "dropdown-input" ? ["Option A", "Option B"] : undefined}
+                      actionIcon={type === "action-input" ? <CaretIcon /> : undefined}
+                    />
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))}
         </div>
-      </Section>
+      </section>
 
       <Section title="Cards">
         <AffiliateLinkCard />

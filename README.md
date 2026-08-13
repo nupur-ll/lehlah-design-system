@@ -53,7 +53,7 @@ context (reference code + screenshot) for each component's documentation page, e
 and fallback values, and hand-adapting the result into clean, typed React components rather than shipping the
 raw generated markup. See [`docs/TOKENS.md`](./docs/TOKENS.md#gaps--things-to-double-check) and
 [`docs/COMPONENTS.md#not-included`](./docs/COMPONENTS.md#not-included) for an honest list of what wasn't
-captured (Navbar, OTP input, feature icon assets) and why.
+captured (Navbar, feature icon assets) and why.
 
 ## License
 

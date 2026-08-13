@@ -1,4 +1,4 @@
-import { useId, useState } from "react";
+import { useId, useRef, useState } from "react";
 import type { InputHTMLAttributes, ReactNode } from "react";
 
 export type InputFieldType =
@@ -6,14 +6,40 @@ export type InputFieldType =
   | "action-input"
   | "dropdown-input"
   | "prefix-input"
+  | "otp-input"
   | "search-input";
 
+export type InputFieldState = "default" | "focused" | "filled" | "error" | "disabled";
+
+/**
+ * Which states actually exist per type in the Figma `input-field` component
+ * set (node 724:1449). Not every type has all 5 states — only text-input
+ * carries a "disabled" variant, and search-input only ever shows
+ * default/focused/filled.
+ */
+const STATES_BY_TYPE: Record<InputFieldType, InputFieldState[]> = {
+  "text-input": ["default", "focused", "filled", "error", "disabled"],
+  "action-input": ["default", "focused", "filled", "error"],
+  "dropdown-input": ["default", "focused", "filled", "error"],
+  "prefix-input": ["default", "focused", "filled", "error"],
+  "otp-input": ["default", "focused", "filled", "error"],
+  "search-input": ["default", "focused", "filled"],
+};
+
 export interface InputFieldProps
-  extends Omit<InputHTMLAttributes<HTMLInputElement>, "type" | "prefix"> {
+  extends Omit<InputHTMLAttributes<HTMLInputElement>, "type" | "prefix" | "size"> {
   type?: InputFieldType;
   label?: string;
   mandatory?: boolean;
   error?: string;
+  /**
+   * Force a specific visual state. Mainly for documentation/galleries that
+   * need to reproduce Figma's exact variant grid — omit this in real usage
+   * and the state is derived automatically from disabled / error / focus /
+   * value. Ignored if the requested state doesn't exist for this `type`
+   * (see STATES_BY_TYPE).
+   */
+  state?: InputFieldState;
   /** icon rendered in the trailing 36x36 slot for `action-input` */
   actionIcon?: ReactNode;
   onAction?: () => void;
@@ -21,29 +47,57 @@ export interface InputFieldProps
   options?: string[];
   /** country calling code prefix for `prefix-input`, e.g. "+91" */
   prefix?: string;
+  /** number of digit boxes for `otp-input` (default 6) */
+  otpLength?: number;
+  otpValue?: string;
+  onOtpChange?: (value: string) => void;
 }
+
+const CaretDownIcon = () => (
+  <svg viewBox="0 0 24 24" fill="none" className="size-6 shrink-0 text-[color:var(--input-field-color-icon)]" aria-hidden>
+    <path d="M6 9l6 6 6-6" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" />
+  </svg>
+);
+
+const SearchIcon = () => (
+  <svg viewBox="0 0 24 24" fill="none" className="size-5 shrink-0 text-[color:var(--input-field-color-icon)]" aria-hidden>
+    <circle cx="11" cy="11" r="7" stroke="currentColor" strokeWidth={1.5} />
+    <path d="M21 21l-4-4" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round" />
+  </svg>
+);
 
 /**
  * InputField — LehLah Design System
- * Figma: component set `input-field` (node 724:1449). Covers text, action
- * (icon affordance, e.g. a date-picker trigger), dropdown, prefix (phone
- * number) and search variants. The OTP variant is intentionally left out of
- * this generic component — build a dedicated <OtpInput /> from the same
- * tokens if/when that flow is needed, since its 4/6-box layout doesn't fit
- * this component's single-field shape.
+ * Figma: component set `input-field` (node 724:1449). Covers all 6 types —
+ * text, action (icon affordance, e.g. a date-picker trigger), dropdown,
+ * prefix (phone number), otp (digit boxes), and search — and gates the
+ * available states per type to match the file exactly (see STATES_BY_TYPE).
+ *
+ * Important quirk carried over from the source file: for every "boxed" type
+ * except search-input, the **default** state shows only the small label —
+ * there is no visible value/placeholder line until the field becomes
+ * focused, filled, in error, or disabled. The underlying control is always
+ * mounted (so label-click-to-focus and real typing still work), just
+ * visually collapsed while in the default state.
  */
 export default function InputField({
   type = "text-input",
   label = "Input Label",
   mandatory = false,
   error,
+  state: stateOverride,
   actionIcon,
   onAction,
   options = [],
   prefix = "+91",
+  otpLength = 6,
+  otpValue = "",
+  onOtpChange,
   className = "",
   disabled,
   id,
+  value,
+  defaultValue,
   onFocus,
   onBlur,
   ...rest
@@ -51,94 +105,217 @@ export default function InputField({
   const [focused, setFocused] = useState(false);
   const autoId = useId();
   const inputId = id ?? autoId;
+  const otpRefs = useRef<Array<HTMLInputElement | null>>([]);
   const hasError = Boolean(error);
+  const hasValue =
+    type === "otp-input" ? otpValue.length > 0 : Boolean(value ?? defaultValue);
 
-  const borderColor = disabled
-    ? "border-[var(--input-field-color-border-default)]"
+  const derivedState: InputFieldState = disabled
+    ? "disabled"
     : hasError
-      ? "border-[var(--input-field-color-border-error)]"
+      ? "error"
       : focused
-        ? "border-[var(--input-field-color-border-focused)]"
-        : "border-[var(--input-field-color-border-default)]";
+        ? "focused"
+        : hasValue
+          ? "filled"
+          : "default";
 
+  const validStates = STATES_BY_TYPE[type];
+  const state: InputFieldState =
+    stateOverride && validStates.includes(stateOverride) ? stateOverride : derivedState;
+
+  // search-input never collapses to label-only — every other type does.
+  const showValueRow = type === "search-input" ? true : state !== "default";
+  const isDisabled = state === "disabled";
+
+  const borderColor =
+    state === "disabled"
+      ? "border-[var(--input-field-color-border-default)]"
+      : state === "error"
+        ? "border-[var(--input-field-color-border-error)]"
+        : state === "focused"
+          ? "border-[var(--input-field-color-border-focused)]"
+          : "border-[var(--input-field-color-border-default)]";
+
+  // prefix-input and otp-input can grow taller than the base 52px once their
+  // second row / digit boxes are shown, so they get min-h instead of a fixed
+  // h, and start-aligned content instead of vertically centered.
+  const isExpandingType = type === "prefix-input" || type === "otp-input";
   const containerClasses = [
-    "flex h-[52px] w-full items-center gap-1 overflow-hidden rounded-[var(--input-field-corner-radius)]",
-    "border-[1.5px] border-solid px-[var(--surface-padding-m)] py-[var(--surface-padding-s)]",
+    "flex w-full items-center gap-1 overflow-hidden rounded-[var(--input-field-corner-radius)]",
+    isExpandingType ? "min-h-[52px] items-start py-[var(--surface-padding-s)]" : "h-[52px]",
+    "border-[1.5px] border-solid px-[var(--surface-padding-m)]",
+    isExpandingType ? "" : "py-[var(--surface-padding-s)]",
     "bg-[var(--input-field-color-surface)]",
-    disabled ? "opacity-60" : "",
+    isDisabled ? "opacity-60" : "",
     borderColor,
   ].join(" ");
+
+  // Classes that visually collapse a still-mounted, still-focusable control
+  // to nothing — used for the label-only default state.
+  const collapse = "h-0 overflow-hidden opacity-0 pointer-events-none";
+
+  const controlTextClasses =
+    "w-full truncate bg-transparent text-[length:var(--type-title-medium-size)] leading-[var(--type-title-medium-line-height)] text-[color:var(--input-field-color-input-text)] outline-none";
+
+  const labelRow = (
+    <label
+      htmlFor={type === "otp-input" ? `${inputId}-0` : inputId}
+      className="flex items-center gap-0.5 text-[length:var(--type-body-medium-size)] leading-[var(--type-body-medium-line-height)] text-[color:var(--input-field-color-input-label)]"
+    >
+      {label}
+      {mandatory && (
+        <span className="text-[color:var(--input-field-color-mandatory-indicator)]">*</span>
+      )}
+    </label>
+  );
+
+  const focusHandlers = {
+    onFocus: (e: React.FocusEvent<HTMLInputElement>) => {
+      setFocused(true);
+      onFocus?.(e);
+    },
+    onBlur: (e: React.FocusEvent<HTMLInputElement>) => {
+      setFocused(false);
+      onBlur?.(e);
+    },
+  };
+
+  let control: ReactNode;
+  let trailingIcon: ReactNode = null;
+  let leadingPersistent: ReactNode = null;
+
+  if (type === "dropdown-input") {
+    control = (
+      <select
+        id={inputId}
+        disabled={isDisabled}
+        value={value}
+        defaultValue={defaultValue}
+        onFocus={() => setFocused(true)}
+        onBlur={() => setFocused(false)}
+        className={[controlTextClasses, showValueRow ? "" : collapse].join(" ")}
+      >
+        {options.map((opt) => (
+          <option key={opt} value={opt}>
+            {opt}
+          </option>
+        ))}
+      </select>
+    );
+    trailingIcon = <CaretDownIcon />;
+  } else if (type === "otp-input") {
+    const digits = Array.from({ length: otpLength }, (_, i) => otpValue[i] ?? "");
+    control = (
+      <div className={["flex gap-2 pt-1", showValueRow ? "" : collapse].join(" ")}>
+        {digits.map((digit, i) => (
+          <input
+            key={i}
+            id={`${inputId}-${i}`}
+            ref={(el) => (otpRefs.current[i] = el)}
+            disabled={isDisabled}
+            inputMode="numeric"
+            maxLength={1}
+            value={digit}
+            onFocus={() => setFocused(true)}
+            onBlur={() => setFocused(false)}
+            onChange={(e) => {
+              const char = e.target.value.replace(/\D/g, "").slice(-1);
+              const next = digits.slice();
+              next[i] = char;
+              onOtpChange?.(next.join(""));
+              if (char && i < otpLength - 1) otpRefs.current[i + 1]?.focus();
+            }}
+            onKeyDown={(e) => {
+              if (e.key === "Backspace" && !digits[i] && i > 0) {
+                otpRefs.current[i - 1]?.focus();
+              }
+            }}
+            className="size-10 rounded-[var(--input-field-corner-radius)] border-[1.5px] border-solid border-[var(--input-field-color-border-default)] bg-[var(--input-field-color-surface)] text-center text-[length:var(--type-title-medium-size)] text-[color:var(--input-field-color-input-text)] outline-none focus:border-[var(--input-field-color-border-focused)]"
+          />
+        ))}
+      </div>
+    );
+  } else if (type === "prefix-input") {
+    // Persistent country selector (flag + caret) — always visible regardless
+    // of state.
+    leadingPersistent = (
+      <span className="flex shrink-0 items-center gap-0.5 pr-1 text-[color:var(--input-field-color-input-text)]">
+        <span aria-hidden>🇮🇳</span>
+        <CaretDownIcon />
+      </span>
+    );
+    control = (
+      <div className={["flex items-center gap-1", showValueRow ? "pt-0.5" : collapse].join(" ")}>
+        <span className="shrink-0 text-[length:var(--type-title-medium-size)] leading-[var(--type-title-medium-line-height)] text-[color:var(--input-field-color-input-text)]">
+          {prefix}
+        </span>
+        <input
+          id={inputId}
+          disabled={isDisabled}
+          value={value}
+          defaultValue={defaultValue}
+          {...focusHandlers}
+          className={controlTextClasses}
+          {...rest}
+        />
+      </div>
+    );
+  } else if (type === "search-input") {
+    control = (
+      <input
+        id={inputId}
+        disabled={isDisabled}
+        placeholder={label}
+        value={value}
+        defaultValue={defaultValue}
+        {...focusHandlers}
+        className={[
+          controlTextClasses,
+          "placeholder:text-[color:var(--input-field-color-input-label)]",
+          state === "filled" ? "font-medium" : "font-normal",
+        ].join(" ")}
+        {...rest}
+      />
+    );
+    trailingIcon = <SearchIcon />;
+  } else {
+    // text-input / action-input
+    control = (
+      <input
+        id={inputId}
+        disabled={isDisabled}
+        value={value}
+        defaultValue={defaultValue}
+        {...focusHandlers}
+        className={[controlTextClasses, showValueRow ? "" : collapse].join(" ")}
+        {...rest}
+      />
+    );
+    if (type === "action-input") {
+      trailingIcon = (
+        <button
+          type="button"
+          onClick={onAction}
+          disabled={isDisabled}
+          aria-label="Input action"
+          className="flex size-9 shrink-0 items-center justify-center rounded [&_svg]:size-7 text-[color:var(--input-field-color-icon)]"
+        >
+          {actionIcon}
+        </button>
+      );
+    }
+  }
 
   return (
     <div className={["flex w-full flex-col items-start gap-1", className].join(" ")}>
       <div className={containerClasses}>
-        {type === "prefix-input" && (
-          <span className="shrink-0 text-[length:var(--type-title-medium-size)] leading-[var(--type-title-medium-line-height)] text-[color:var(--input-field-color-input-text)]">
-            {prefix}
-          </span>
-        )}
+        {leadingPersistent}
         <div className="flex min-w-0 flex-1 flex-col gap-0.5">
-          <label
-            htmlFor={inputId}
-            className="flex items-center gap-0.5 text-[length:var(--type-body-medium-size)] leading-[var(--type-body-medium-line-height)] text-[color:var(--input-field-color-input-label)]"
-          >
-            {label}
-            {mandatory && (
-              <span className="text-[color:var(--input-field-color-mandatory-indicator)]">*</span>
-            )}
-          </label>
-          {type === "dropdown-input" ? (
-            <select
-              id={inputId}
-              disabled={disabled}
-              onFocus={() => setFocused(true)}
-              onBlur={() => setFocused(false)}
-              className="w-full truncate bg-transparent text-[length:var(--type-title-medium-size)] leading-[var(--type-title-medium-line-height)] text-[color:var(--input-field-color-input-text)] outline-none"
-            >
-              {options.map((opt) => (
-                <option key={opt} value={opt}>
-                  {opt}
-                </option>
-              ))}
-            </select>
-          ) : (
-            <input
-              id={inputId}
-              disabled={disabled}
-              onFocus={(e) => {
-                setFocused(true);
-                onFocus?.(e);
-              }}
-              onBlur={(e) => {
-                setFocused(false);
-                onBlur?.(e);
-              }}
-              className="w-full truncate bg-transparent text-[length:var(--type-title-medium-size)] leading-[var(--type-title-medium-line-height)] text-[color:var(--input-field-color-input-text)] outline-none placeholder:text-[color:var(--input-field-color-input-label)]"
-              {...rest}
-            />
-          )}
+          {type === "search-input" ? control : labelRow}
+          {type !== "search-input" && control}
         </div>
-        {type === "action-input" && (
-          <button
-            type="button"
-            onClick={onAction}
-            aria-label="Input action"
-            className="flex size-9 shrink-0 items-center justify-center rounded [&_svg]:size-7 text-[color:var(--input-field-color-icon)]"
-          >
-            {actionIcon}
-          </button>
-        )}
-        {type === "dropdown-input" && (
-          <svg viewBox="0 0 24 24" fill="none" className="size-6 shrink-0 text-[color:var(--input-field-color-icon)]" aria-hidden>
-            <path d="M6 9l6 6 6-6" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" />
-          </svg>
-        )}
-        {type === "search-input" && (
-          <svg viewBox="0 0 24 24" fill="none" className="size-5 shrink-0 text-[color:var(--input-field-color-icon)]" aria-hidden>
-            <circle cx="11" cy="11" r="7" stroke="currentColor" strokeWidth={1.5} />
-            <path d="M21 21l-4-4" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round" />
-          </svg>
-        )}
+        {trailingIcon}
       </div>
       {hasError && (
         <div className="flex items-center gap-1 text-[color:var(--input-field-color-error-message)]">

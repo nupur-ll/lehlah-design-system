@@ -16,7 +16,7 @@ runtime dependency beyond React itself.
 | `Tab` | `tab` (node `992:2900`) | `pill` and `underlined` families, each default/selected. |
 | `Banner` | `banner` (node `752:1504`) | 6 colors × 3 weights, 350×150 promo card with a `creative` slot for artwork. |
 | `IconButton` | `action` sub-component (seen nested in `input-field`) | Bare 36×36 icon tap target, used inline in inputs/cards/toolbars. |
-| `InputField` | `input-field` (node `724:1449`) | `text-input`, `action-input`, `dropdown-input`, `prefix-input`, `search-input`. (OTP variant intentionally not covered here — see below.) |
+| `InputField` | `input-field` (node `724:1449`) | All 6 types: `text-input`, `action-input`, `dropdown-input`, `prefix-input`, `otp-input`, `search-input`. States are gated per type to match the file exactly — only `text-input` has a `disabled` variant, `search-input` has no `error`/`disabled` variant, and every other type has `default`/`focused`/`filled`/`error`. The plain `default` state renders label-only (no visible value line) for every type except `search-input`, matching the file's own conditional rendering. |
 | `AffiliateLinkCard` | `affiliate-link-card` (node `794:2052`) | 5 variants: `default`, `collection`, `curated-collection`, `auto-dm`, `amazon`. |
 | `CollectionCard` | `collection-card` (node `794:2053`) | 2×2 image grid + metadata + stats grid. |
 | `BottomSheet` | `bottom-sheet` + nested filter list (nodes `938:124`, `935:8109`, `930:1298`, `930:1354`) | Mobile filter sheet: drag handle, header, search, two-pane filter/option list, sticky action row. |
@@ -26,10 +26,6 @@ runtime dependency beyond React itself.
 - **Navbar** — a `navbar` component set exists in the Figma file's published library, but no page link was
   available to pull its exact spec, so it isn't built here. Grab its Figma URL (Figma → right-click the frame →
   Copy link) and it can be added the same way as everything else.
-- **OTP input** — the `input-field` component set has an `otp-input` type (4 boxes, `Filter Name`-style single
-  digit fields), but its box-grid shape doesn't fit `InputField`'s single-field layout, so it was left out rather
-  than bolted on awkwardly. Build a dedicated `OtpInput` from the same `--input-field-*` tokens if that flow comes
-  up.
 - **Feature icons** (`feature=opportunities`, `whitelisting`, `collections`, `auto-dm`, `rewards`, `collab`,
   `gifting`, `link-generator`) — this is an 8-icon symbol set (node `794:310`), not a component with variants.
   Export those 8 SVGs from Figma directly (Export → SVG) rather than re-drawing them here.
