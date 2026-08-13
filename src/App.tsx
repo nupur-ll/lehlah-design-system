@@ -83,90 +83,40 @@ const INPUT_FIELD_MATRIX: { type: InputFieldType; states: InputFieldState[] }[] 
 // Mirrors src/styles/tokens.css exactly — see docs/TOKENS.md for the full
 // reference table with descriptions/provenance.
 
+// Full 100-1000 step ramp for a color family — raw values only, no role/usage
+// label (per the "primitives are pure values" rule; see docs/TOKENS.md §1).
+const RAMP_STEPS = ["100", "200", "300", "400", "500", "600", "700", "800", "900", "1000"];
+function rampSwatches(color: string) {
+  return RAMP_STEPS.map((step) => ({ label: step, token: `--color-${color}-${step}` }));
+}
+
 const PRIMITIVE_GROUPS: { name: string; swatches: { label: string; token: string }[] }[] = [
   {
     name: "Grey",
     swatches: [
       { label: "white", token: "--color-grey-white" },
-      { label: "100", token: "--color-grey-100" },
-      { label: "200", token: "--color-grey-200" },
-      { label: "400", token: "--color-grey-400" },
-      { label: "700", token: "--color-grey-700" },
-      { label: "1000", token: "--color-grey-1000" },
+      ...rampSwatches("grey"),
       { label: "black", token: "--color-grey-black" },
       { label: "70", token: "--color-grey-70" },
     ],
   },
+  { name: "Lime", swatches: rampSwatches("lime") },
+  { name: "Purple", swatches: rampSwatches("purple") },
+  { name: "Magenta", swatches: rampSwatches("magenta") },
+  { name: "Orange", swatches: rampSwatches("orange") },
+  { name: "Blue", swatches: rampSwatches("blue") },
+  { name: "Teal", swatches: rampSwatches("teal") },
   {
-    name: "Lime (Brand)",
-    swatches: [
-      { label: "300", token: "--color-lime-300" },
-      { label: "400", token: "--color-lime-400" },
-      { label: "500", token: "--color-lime-500" },
-      { label: "600", token: "--color-lime-600" },
-    ],
+    name: "Green",
+    swatches: [...rampSwatches("green"), { label: "solid", token: "--color-green-solid" }],
   },
-  {
-    name: "Purple (Milestone)",
-    swatches: [
-      { label: "400", token: "--color-purple-400" },
-      { label: "500", token: "--color-purple-500" },
-      { label: "600", token: "--color-purple-600" },
-      { label: "700", token: "--color-purple-700" },
-    ],
-  },
-  {
-    name: "Magenta (Contest)",
-    swatches: [
-      { label: "400", token: "--color-magenta-400" },
-      { label: "500", token: "--color-magenta-500" },
-      { label: "600", token: "--color-magenta-600" },
-      { label: "700", token: "--color-magenta-700" },
-    ],
-  },
-  {
-    name: "Orange (Gifting)",
-    swatches: [
-      { label: "300", token: "--color-orange-300" },
-      { label: "500", token: "--color-orange-500" },
-      { label: "600", token: "--color-orange-600" },
-    ],
-  },
-  {
-    name: "Blue (Paid Collabs)",
-    swatches: [
-      { label: "400", token: "--color-blue-400" },
-      { label: "500", token: "--color-blue-500" },
-      { label: "600", token: "--color-blue-600" },
-      { label: "700", token: "--color-blue-700" },
-    ],
-  },
-  {
-    name: "Teal (Opportunities)",
-    swatches: [
-      { label: "400", token: "--color-teal-400" },
-      { label: "500", token: "--color-teal-500" },
-      { label: "600", token: "--color-teal-600" },
-      { label: "700", token: "--color-teal-700" },
-    ],
-  },
-  {
-    name: "Green (Success)",
-    swatches: [
-      { label: "600", token: "--color-green-600" },
-      { label: "solid", token: "--color-green-solid" },
-    ],
-  },
-  {
-    name: "Amber (Warning)",
-    swatches: [{ label: "600", token: "--color-amber-600" }],
-  },
-  {
-    name: "Red (Error/Destructive)",
-    swatches: [{ label: "600", token: "--color-red-600" }],
-  },
+  { name: "Amber", swatches: rampSwatches("amber") },
+  { name: "Red", swatches: rampSwatches("red") },
 ];
 
+// Semantics subgroups, matching tokens.css exactly: typography, surface,
+// border, icon, system, brand. (selection-control lives under Components —
+// it's demoed live by RadioButton/Checkbox/ToggleSwitch/Tab further down.)
 const SEMANTIC_COLOR_GROUPS: { name: string; swatches: { label: string; token: string }[] }[] = [
   {
     name: "Typography",
@@ -185,29 +135,42 @@ const SEMANTIC_COLOR_GROUPS: { name: string; swatches: { label: string; token: s
     ],
   },
   {
-    name: "Selection control",
+    name: "Border",
+    swatches: [{ label: "border-grey", token: "--border-color-grey" }],
+  },
+  {
+    name: "Icon",
     swatches: [
-      { label: "action-default", token: "--selection-control-action-default" },
-      { label: "action-selected", token: "--selection-control-action-selected" },
-      { label: "border-dark", token: "--selection-control-border-dark" },
-      { label: "border-grey", token: "--selection-control-border-grey" },
+      { label: "icon-grey", token: "--icon-color-grey" },
+      { label: "icon-dark", token: "--icon-color-dark" },
     ],
   },
   {
-    name: "System role (light tints)",
+    name: "System",
     swatches: [
       { label: "info-light", token: "--system-info-light" },
       { label: "success-light", token: "--system-success-light" },
       { label: "warning-light", token: "--system-warning-light" },
       { label: "error-light", token: "--system-error-light" },
-      { label: "brand-primary-light", token: "--brand-primary-light" },
-      { label: "brand-purple-light", token: "--brand-purple-light" },
-      { label: "brand-teal-light", token: "--brand-teal-light" },
+    ],
+  },
+  {
+    name: "Brand",
+    swatches: [
+      { label: "primary-light", token: "--brand-primary-light" },
+      { label: "purple-light", token: "--brand-purple-light" },
+      { label: "teal-light", token: "--brand-teal-light" },
+      { label: "magenta-light", token: "--brand-magenta-light" },
+      { label: "orange-light", token: "--brand-orange-light" },
     ],
   },
 ];
 
+// Three text-style tiers per docs/TOKENS.md §2: heading, title, body.
 const TYPE_SCALE: { name: string; sizeToken: string; lineHeightToken: string; weight: string }[] = [
+  { name: "heading/large", sizeToken: "--type-heading-large-size", lineHeightToken: "--type-heading-large-line-height", weight: "700" },
+  { name: "heading/medium", sizeToken: "--type-heading-medium-size", lineHeightToken: "--type-heading-medium-line-height", weight: "600" },
+  { name: "heading/small", sizeToken: "--type-heading-small-size", lineHeightToken: "--type-heading-small-line-height", weight: "600" },
   { name: "title/large", sizeToken: "--type-title-large-size", lineHeightToken: "--type-title-large-line-height", weight: "600" },
   { name: "title/medium", sizeToken: "--type-title-medium-size", lineHeightToken: "--type-title-medium-line-height", weight: "500" },
   { name: "body/large", sizeToken: "--type-body-large-size", lineHeightToken: "--type-body-large-line-height", weight: "400" },
@@ -365,7 +328,7 @@ export default function App() {
 
       <Section
         title="Foundations — Semantics"
-        description="Role-based tokens that reference the primitives above — typography, surface, selection-control, and system-role colors."
+        description="Role-based tokens that reference the primitives above — typography, surface, border, icon, system, and brand."
       >
         <div className="flex w-full flex-col gap-5">
           {SEMANTIC_COLOR_GROUPS.map((g) => (
@@ -376,7 +339,7 @@ export default function App() {
 
       <Section
         title="Foundations — Text styles"
-        description="The full type scale (font: Poppins). Every component's text traces back to one of these six styles."
+        description="The full type scale (font: Poppins) across all three tiers — heading, title, body. Every component's text traces back to one of these nine styles."
       >
         <div className="flex w-full flex-col">
           {TYPE_SCALE.map((t) => (

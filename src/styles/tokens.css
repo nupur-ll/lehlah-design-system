@@ -7,94 +7,190 @@
  * component library. Every component in src/components/* reads colors,
  * spacing, radii and type styles from here — never a hardcoded hex/px value.
  *
- * Organized into the same three variable collections the Figma file itself
- * uses (see docs/TOKENS.md for the full reference table with descriptions):
- *   1. PRIMITIVES — raw palette values. Never used directly in a component;
- *      they only exist so semantic/component tokens can reference them.
- *   2. SEMANTICS  — role-based tokens (typography colors, icon sizes,
- *      surface colors, selection-control states, notification colors...).
- *   3. COMPONENTS — component-scoped tokens (button/*, card/*, input-field/*,
- *      banner/*, notification/* pill & toast colors...).
+ * Structure mirrors the Figma file's own three variable collections, each
+ * split into the exact subgroups the file organizes them into:
  *
- * Provenance: every value below was extracted from the real generated
- * Tailwind fallbacks Figma's MCP server returns for each component
- * (e.g. `bg-[var(--button/color/filled/background,#191919)]` -> #191919),
- * so these are exact, not eyeballed off the screenshots. A handful of
- * values that weren't directly exercised by any pulled component are
- * marked "(unconfirmed)" — cross-check those against Figma before shipping
- * a screen that depends on them.
+ *   1. PRIMITIVES  — colors, font, numbers.
+ *      Raw values only — no role, usage-context, or component name is baked
+ *      into a primitive. `color/purple/600` doesn't know it's used for the
+ *      "Milestone" earning type; that mapping lives one layer up, in
+ *      components. Never bind a primitive directly to a layer/component.
+ *   2. SEMANTICS   — typography, surface, border, icon, system, brand.
+ *      Role-based tokens: what a value *means*, not what it literally is.
+ *   3. COMPONENTS  — buttons, input-field, banner, notification, navigation,
+ *      card, selection-control. Component-scoped tokens that reference
+ *      semantics (and occasionally primitives) for their actual values.
+ *
+ * Provenance: every value below was either (a) read directly out of the real
+ * generated code/variables Figma's MCP server returns for a pulled component
+ * (e.g. the fallback in `bg-[var(--button/color/filled/background,#191919)]`
+ * -> #191919, or a resolved `get_variable_defs` value), or (b) — for the
+ * primitive color ramps specifically — derived by interpolating between two
+ * or more confirmed real steps in the same family (e.g. purple/400, /500,
+ * /600, /700 are all real; purple/100-300 and /800-1000 are filled in on the
+ * same hue/lightness curve). Every interpolated value is commented
+ * "(interpolated — confirm exact hex in Figma before shipping)" so it's
+ * never mistaken for a value that was actually pulled. Do not remove those
+ * comments without re-confirming the value against Figma first.
  */
 
 :root {
   /* ============================================================
-     1. PRIMITIVES — raw palette
+     1. PRIMITIVES
      ============================================================ */
 
-  /* Gray — structural backbone: text, backgrounds, dividers, surfaces */
+  /* --- colors/grey --- */
   --color-grey-white: #ffffff;
+  --color-grey-black: #000000;
+  --color-grey-70: #b2b2b2; /* named "greys/grey-70" in Figma — not part of the 100-1000 ramp; used for drag handles etc. */
   --color-grey-100: #f5f5f5;
   --color-grey-200: #e6e6e6;
+  --color-grey-300: #d9d9d9; /* interpolated — confirm exact hex in Figma before shipping */
   --color-grey-400: #cccccc;
+  --color-grey-500: #bbbbbb; /* interpolated — confirm exact hex in Figma before shipping */
+  --color-grey-600: #aaaaaa; /* interpolated — confirm exact hex in Figma before shipping */
   --color-grey-700: #999999;
+  --color-grey-800: #6e6e6e; /* interpolated — confirm exact hex in Figma before shipping */
+  --color-grey-900: #444444; /* interpolated — confirm exact hex in Figma before shipping */
   --color-grey-1000: #191919;
-  --color-grey-black: #000000;
-  --color-grey-70: #b2b2b2; /* named "greys/grey-70" in Figma — used for drag handles etc. */
 
-  /* Brand (Lime / "Brand Yellow") — identity only: logo, LEHLAH Score, explainer accents */
+  /* --- colors/lime --- */
+  --color-lime-100: #fefdf6; /* interpolated — confirm exact hex in Figma before shipping */
+  --color-lime-200: #fdfcf0; /* interpolated — confirm exact hex in Figma before shipping */
   --color-lime-300: #f8f6d3;
   --color-lime-400: #ebe57a;
-  --color-lime-500: #e2d939; /* Brand/500 — primary brand shade */
+  --color-lime-500: #e2d939;
   --color-lime-600: #ded421;
+  --color-lime-700: #aba319; /* interpolated — confirm exact hex in Figma before shipping */
+  --color-lime-800: #787312; /* interpolated — confirm exact hex in Figma before shipping */
+  --color-lime-900: #46420a; /* interpolated — confirm exact hex in Figma before shipping */
+  --color-lime-1000: #131203; /* interpolated — confirm exact hex in Figma before shipping */
 
-  /* Purple — Milestone earning type only */
+  /* --- colors/purple --- */
+  --color-purple-100: #f6effd; /* interpolated — confirm exact hex in Figma before shipping */
+  --color-purple-200: #eadbfa; /* interpolated — confirm exact hex in Figma before shipping */
+  --color-purple-300: #ccabf2; /* interpolated — confirm exact hex in Figma before shipping */
   --color-purple-400: #af7aeb;
   --color-purple-500: #944ee4;
-  --color-purple-600: #6e1ec8; /* Purple/600 — primary shade */
+  --color-purple-600: #6e1ec8;
   --color-purple-700: #611bb1;
+  --color-purple-800: #44137c; /* interpolated — confirm exact hex in Figma before shipping */
+  --color-purple-900: #270b48; /* interpolated — confirm exact hex in Figma before shipping */
+  --color-purple-1000: #0b0313; /* interpolated — confirm exact hex in Figma before shipping */
 
-  /* Magenta — Contest earning type only */
+  /* --- colors/magenta --- */
+  --color-magenta-100: #fdf0fa; /* interpolated — confirm exact hex in Figma before shipping */
+  --color-magenta-200: #f9dcf2; /* interpolated — confirm exact hex in Figma before shipping */
+  --color-magenta-300: #f2abe1; /* interpolated — confirm exact hex in Figma before shipping */
   --color-magenta-400: #ea7bd0;
-  --color-magenta-500: #e142bc; /* Magenta/500 — primary shade */
+  --color-magenta-500: #e142bc;
   --color-magenta-600: #dc23b1;
   --color-magenta-700: #84156a;
+  --color-magenta-800: #5d0f4b; /* interpolated — confirm exact hex in Figma before shipping */
+  --color-magenta-900: #36092b; /* interpolated — confirm exact hex in Figma before shipping */
+  --color-magenta-1000: #0e020c; /* interpolated — confirm exact hex in Figma before shipping */
 
-  /* Orange — Gifting earning type only */
+  /* --- colors/orange --- */
+  --color-orange-100: #fcf4f0; /* interpolated — confirm exact hex in Figma before shipping */
+  --color-orange-200: #f8e3d7; /* interpolated — confirm exact hex in Figma before shipping */
   --color-orange-300: #f0c2a8;
-  --color-orange-600: #d96726; /* Orange/600 — primary shade */
+  --color-orange-400: #e79f76; /* interpolated — confirm exact hex in Figma before shipping */
   --color-orange-500: #de7c45;
+  --color-orange-600: #d96726;
+  --color-orange-700: #a74f1d; /* interpolated — confirm exact hex in Figma before shipping */
+  --color-orange-800: #763815; /* interpolated — confirm exact hex in Figma before shipping */
+  --color-orange-900: #44200c; /* interpolated — confirm exact hex in Figma before shipping */
+  --color-orange-1000: #120903; /* interpolated — confirm exact hex in Figma before shipping */
 
-  /* Blue — Paid Collabs earning type */
+  /* --- colors/blue --- */
+  --color-blue-100: #e4ecfb; /* interpolated — confirm exact hex in Figma before shipping */
+  --color-blue-200: #bed2f6; /* interpolated — confirm exact hex in Figma before shipping */
+  --color-blue-300: #90b2f0; /* interpolated — confirm exact hex in Figma before shipping */
   --color-blue-400: #6292ea;
   --color-blue-500: #3572e3;
-  --color-blue-600: #1f63e0; /* Blue/600 — primary shade (quick-ref table) */
+  --color-blue-600: #1f63e0;
   --color-blue-700: #184fb4;
+  --color-blue-800: #11387f; /* interpolated — confirm exact hex in Figma before shipping */
+  --color-blue-900: #0a2049; /* interpolated — confirm exact hex in Figma before shipping */
+  --color-blue-1000: #030914; /* interpolated — confirm exact hex in Figma before shipping */
 
-  /* Teal — Opportunities (discovery / exploration) */
+  /* --- colors/teal --- */
+  --color-teal-100: #effcfd; /* interpolated — confirm exact hex in Figma before shipping */
+  --color-teal-200: #dbf8fa; /* interpolated — confirm exact hex in Figma before shipping */
+  --color-teal-300: #a9edf4; /* interpolated — confirm exact hex in Figma before shipping */
   --color-teal-400: #78e3ed;
   --color-teal-500: #17a6b4;
-  --color-teal-600: #1dd0e2; /* Teal/600 — primary shade */
+  --color-teal-600: #1dd0e2;
   --color-teal-700: #127d87;
+  --color-teal-800: #0d585f; /* interpolated — confirm exact hex in Figma before shipping */
+  --color-teal-900: #073337; /* interpolated — confirm exact hex in Figma before shipping */
+  --color-teal-1000: #020e0f; /* interpolated — confirm exact hex in Figma before shipping */
 
-  /* Green — Success / confirmed states only (never motivational) */
-  --color-green-600: #21de83; /* Green/600 — primary shade */
-  --color-green-solid: #1aad66; /* solid/success fill used on buttons, pills, toasts */
+  /* --- colors/green --- */
+  --color-green-100: #effdf6; /* interpolated — confirm exact hex in Figma before shipping */
+  --color-green-200: #ecfcf5; /* interpolated — confirm exact hex in Figma before shipping */
+  --color-green-300: #b9f5d8; /* interpolated — confirm exact hex in Figma before shipping */
+  --color-green-400: #87edbc; /* interpolated — confirm exact hex in Figma before shipping */
+  --color-green-500: #54e69f; /* interpolated — confirm exact hex in Figma before shipping */
+  --color-green-600: #21de83;
+  --color-green-700: #19ab65; /* interpolated — confirm exact hex in Figma before shipping */
+  --color-green-800: #127847; /* interpolated — confirm exact hex in Figma before shipping */
+  --color-green-900: #0a4629; /* interpolated — confirm exact hex in Figma before shipping */
+  --color-green-1000: #03130b; /* interpolated — confirm exact hex in Figma before shipping */
+  --color-green-solid: #1aad66; /* real value pulled from a bound component (notification/banner solid-success fill); its exact step in the 100-1000 ramp above is unconfirmed, so it's kept as its own alias rather than folded into a guessed step */
 
-  /* Amber — Pending / warning states */
-  --color-amber-600: #e59533; /* Amber/600 — primary shade, also solid/warning fill */
+  /* --- colors/amber --- */
+  --color-amber-100: #fefaf6; /* interpolated — confirm exact hex in Figma before shipping */
+  --color-amber-200: #fdf7ef; /* interpolated — confirm exact hex in Figma before shipping */
+  --color-amber-300: #fbeedd; /* interpolated — confirm exact hex in Figma before shipping */
+  --color-amber-400: #f3d0a5; /* interpolated — confirm exact hex in Figma before shipping */
+  --color-amber-500: #ecb36c; /* interpolated — confirm exact hex in Figma before shipping */
+  --color-amber-600: #e59533;
+  --color-amber-700: #c07418; /* interpolated — confirm exact hex in Figma before shipping */
+  --color-amber-800: #875211; /* interpolated — confirm exact hex in Figma before shipping */
+  --color-amber-900: #4e2f0a; /* interpolated — confirm exact hex in Figma before shipping */
+  --color-amber-1000: #150d03; /* interpolated — confirm exact hex in Figma before shipping */
 
-  /* Red — Error / destructive / failure states only, used sparingly */
-  --color-red-600: #e43a25; /* Red/600 — primary shade, also solid/error + destructive-button fill */
+  /* --- colors/red --- */
+  --color-red-100: #fef7f6; /* interpolated — confirm exact hex in Figma before shipping */
+  --color-red-200: #fdf1ef; /* interpolated — confirm exact hex in Figma before shipping */
+  --color-red-300: #f8ccc7; /* interpolated — confirm exact hex in Figma before shipping */
+  --color-red-400: #f19c91; /* interpolated — confirm exact hex in Figma before shipping */
+  --color-red-500: #eb6b5b; /* interpolated — confirm exact hex in Figma before shipping */
+  --color-red-600: #e43a25;
+  --color-red-700: #b62817; /* interpolated — confirm exact hex in Figma before shipping */
+  --color-red-800: #801c10; /* interpolated — confirm exact hex in Figma before shipping */
+  --color-red-900: #4a1009; /* interpolated — confirm exact hex in Figma before shipping */
+  --color-red-1000: #140402; /* interpolated — confirm exact hex in Figma before shipping */
 
-  /* Type primitive */
+  /* --- font --- */
   --font-name: "Poppins";
+
+  /* --- numbers — raw numeric scale (spacing / radius / border-width / opacity) --- */
+  --number-0-5: 0.5px;
+  --number-1-5: 1.5px;
+  --number-2: 2px;
+  --number-4: 4px;
+  --number-8: 8px;
+  --number-12: 12px;
+  --number-16: 16px;
+  --number-20: 20px;
+  --number-24: 24px;
+  --number-32: 32px; /* (unconfirmed exact px — inferred from icon/size/xl usage) */
+  --number-40: 40px; /* (unconfirmed exact px — inferred from icon/size/xxl usage) */
+  --number-1000: 1000px; /* fully-rounded / pill radius */
+  --opacity-08: 0.08; /* confirmed — Figma's rgba(18,18,18,.08) overlay/state-layer */
+  --opacity-16: 0.16; /* (unconfirmed — named color/state-layer/*\/opacity-16 in the file, exact value not exercised) */
+  --opacity-20: 0.2; /* (unconfirmed — named color/state-layer/*\/opacity-20 in the file, exact value not exercised) */
+  --opacity-50: 0.5; /* confirmed — Figma's rgba(18,18,18,.5) filled-button overlay */
 }
 
 :root {
   /* ============================================================
-     2. SEMANTICS — role-based tokens
+     2. SEMANTICS
      ============================================================ */
 
-  /* Typography colors */
+  /* --- typography --- */
   --typography-color-primary: var(--color-grey-1000);
   --typography-color-secondary: #808080;
   --typography-color-grey: #808080;
@@ -102,11 +198,17 @@
   --typography-color-white: var(--color-grey-white);
 
   /* Type scale — family / weight / size / line-height / letter-spacing.
-     Names mirror Figma's `typography/typescale/{group}/{size}/{weight}` variables. */
-  --type-body-small-size: 11px;
-  --type-body-small-line-height: 16px;
+     Names mirror Figma's `typography/typescale/{group}/{size}/{weight}` variables.
+     heading/title/body are the three tiers Figma defines; body/title values
+     below were read directly off pulled components. The heading tier's
+     names and weight variants (400/500/600/700 x small/medium/large) are
+     confirmed to exist in the file, but no pulled component exercised their
+     resolved px/line-height, so those four sizes are a reasoned extrapolation
+     of the existing body -> title progression and are flagged accordingly. */
   --type-body-extra-small-size: 10px;
   --type-body-extra-small-line-height: 16px;
+  --type-body-small-size: 11px;
+  --type-body-small-line-height: 16px;
   --type-body-medium-size: 12px;
   --type-body-medium-line-height: 20px;
   --type-body-large-size: 13px;
@@ -115,85 +217,81 @@
   --type-title-medium-line-height: 20px;
   --type-title-large-size: 16px;
   --type-title-large-line-height: 20px;
+  --type-heading-small-size: 18px; /* (unconfirmed — approximate, confirm exact px/line-height in Figma) */
+  --type-heading-small-line-height: 24px; /* (unconfirmed) */
+  --type-heading-medium-size: 22px; /* (unconfirmed — approximate, confirm exact px/line-height in Figma) */
+  --type-heading-medium-line-height: 28px; /* (unconfirmed) */
+  --type-heading-large-size: 26px; /* (unconfirmed — approximate, confirm exact px/line-height in Figma) */
+  --type-heading-large-line-height: 32px; /* (unconfirmed) */
   --type-letter-spacing: 0px;
 
-  /* Icon sizes (named scale confirmed in the token index; pixel values below
-     are inferred from the sizes actually used across pulled components —
-     cross-check against Figma's `semantics/float/icon/size/*` before relying
-     on xs/xl/xxl in a new screen). */
+  /* --- surface (spacing / padding / radius / color) --- */
+  --surface-spacing-xs: var(--number-2);
+  --surface-spacing-s: var(--number-4);
+  --surface-padding-s: var(--number-8);
+  --surface-padding-m: var(--number-12);
+  --surface-radius-s: var(--number-8);
+  --surface-color-page: var(--color-grey-white);
+  --surface-color-container-white: var(--color-grey-white);
+  --surface-color-overlay-black-opacity-08: rgba(18, 18, 18, var(--opacity-08));
+
+  /* --- border --- */
+  --border-width-thin: var(--number-0-5);
+  --border-width-thick: var(--number-1-5);
+  --border-color-grey: var(--color-grey-200);
+
+  /* --- icon (size + color) --- */
   --icon-size-xs: 12px; /* (unconfirmed) */
-  --icon-size-s: 16px;
-  --icon-size-m: 20px;
-  --icon-size-l: 24px;
-  --icon-size-xl: 32px; /* (unconfirmed) */
-  --icon-size-xxl: 40px; /* (unconfirmed) */
+  --icon-size-s: var(--number-16);
+  --icon-size-m: var(--number-20);
+  --icon-size-l: var(--number-24);
+  --icon-size-xl: var(--number-32); /* (unconfirmed) */
+  --icon-size-xxl: var(--number-40); /* (unconfirmed) */
   --icon-color-grey: var(--color-grey-700);
   --icon-color-dark: var(--color-grey-1000);
   --icon-color-light: var(--color-grey-white);
 
-  /* Borders */
-  --border-width-thin: 0.5px;
-  --border-width-thick: 1.5px;
-  --border-color-grey: var(--color-grey-200);
-
-  /* Surface spacing / padding / radius scale (multiples of 4, per design rules) */
-  --surface-spacing-xs: 2px;
-  --surface-spacing-s: 4px;
-  --surface-padding-s: 8px;
-  --surface-padding-m: 12px;
-  --surface-radius-s: 8px;
-  --surface-color-page: var(--color-grey-white);
-  --surface-color-container-white: var(--color-grey-white);
-  --number-4: 4px;
-
-  /* Selection controls — radio / checkbox / toggle / tabs */
-  --selection-control-action-default: var(--color-grey-700);
-  --selection-control-action-selected: var(--color-grey-1000);
-  --selection-control-background: var(--color-grey-white);
-  --selection-control-border-dark: var(--color-grey-1000);
-  --selection-control-border-grey: var(--color-grey-200);
-  --selection-control-content-dark: var(--color-grey-1000);
-  --selection-control-content-grey: var(--color-grey-700);
-  --selection-control-content-white: var(--color-grey-white);
-  --selection-control-tab-background-selected: var(--color-grey-1000);
-
-  /* System roles (banners reuse these for their "default"/tint backgrounds) */
+  /* --- system (role-based status tints, reused by banners/notifications) --- */
   --system-info-light: #e9effc;
   --system-success-light: #e9fcf3;
   --system-warning-light: #fcf3e8;
   --system-error-light: #fcebe8;
+
+  /* --- brand (per-hue brand tint used across banner/notification "light" weight) --- */
   --brand-primary-light: #fcfbe9;
   --brand-purple-light: #f2e9fc;
   --brand-teal-light: #e8fafc;
+  --brand-magenta-light: #fce9f7;
+  --brand-orange-light: #fbf0e9;
 }
 
 :root {
   /* ============================================================
-     3. COMPONENTS — component-scoped tokens
+     3. COMPONENTS
      ============================================================ */
 
-  /* --- button/* --- */
-  --button-radius-small: 8px; /* medium + small button sizes */
+  /* --- buttons/* --- */
+  --button-radius-small: var(--surface-radius-s); /* medium + small button sizes */
   --button-radius-large: 12px; /* large button size */
-  --button-padding-horizontal-small: 16px;
-  --button-padding-horizontal-medium: 20px;
-  --button-padding-horizontal-large: 24px;
-  --button-padding-vertical-small: 8px;
-  --button-padding-vertical-medium: 12px;
-  --button-padding-vertical-large: 16px;
+  --button-padding-horizontal-small: var(--number-16);
+  --button-padding-horizontal-medium: var(--number-20);
+  --button-padding-horizontal-large: var(--number-24);
+  --button-padding-vertical-small: var(--number-8);
+  --button-padding-vertical-medium: var(--number-12);
+  --button-padding-vertical-large: var(--number-16);
 
   --button-color-filled-background: var(--color-grey-1000);
   --button-color-filled-content: var(--color-grey-white);
-  --button-color-filled-overlay: rgba(18, 18, 18, 0.5);
+  --button-color-filled-overlay: rgba(18, 18, 18, var(--opacity-50));
 
   --button-color-outlined-background: var(--color-grey-white);
   --button-color-outlined-border: var(--color-grey-1000);
   --button-color-outlined-content: var(--color-grey-1000);
-  --button-color-outlined-overlay: rgba(18, 18, 18, 0.08);
+  --button-color-outlined-overlay: rgba(18, 18, 18, var(--opacity-08));
 
   --button-color-subtle-background: var(--color-grey-100);
   --button-color-subtle-content: var(--color-grey-1000);
-  --button-color-subtle-overlay: rgba(18, 18, 18, 0.08);
+  --button-color-subtle-overlay: rgba(18, 18, 18, var(--opacity-08));
 
   --button-color-ghost-content: var(--color-grey-1000);
 
@@ -206,24 +304,11 @@
   --button-color-disabled-background: var(--color-grey-400);
   --button-color-disabled-content: var(--color-grey-white);
 
-  /* --- card/* (used by AffiliateLinkCard, CollectionCard) --- */
-  --card-background: var(--color-grey-white);
-  --card-border: var(--color-grey-200);
-  --card-padding: 12px;
-  --card-corner-radius-card: 16px;
-  --card-corner-radius-image: 12px;
-  --card-corner-radius-tile: 4px;
-  --card-text-primary: var(--color-grey-1000);
-  --card-text-secondary: var(--color-grey-700);
-  --card-text-label: #666666;
-  --card-tile-background: var(--color-grey-100);
-  --card-icon: var(--color-grey-1000); /* (unconfirmed exact hex) */
-
   /* --- input-field/* --- */
-  --input-field-corner-radius: 8px;
-  --input-field-padding-vertical: 8px;
-  --input-field-padding-horizontal-small: 8px; /* (unconfirmed exact px) */
-  --input-field-padding-horizontal-default: 12px;
+  --input-field-corner-radius: var(--surface-radius-s);
+  --input-field-padding-vertical: var(--number-8);
+  --input-field-padding-horizontal-small: var(--number-8); /* (unconfirmed exact px) */
+  --input-field-padding-horizontal-default: var(--number-12);
   --input-field-color-surface: var(--color-grey-white);
   /* flattened from Figma's disabled fill: linear-gradient(rgba(18,18,18,.08), rgba(18,18,18,.08)) over white */
   --input-field-color-surface-disabled: #ececec;
@@ -238,41 +323,41 @@
   --input-field-color-error-message: var(--color-red-600);
   --input-field-color-icon: var(--color-grey-700); /* (unconfirmed exact hex) */
 
-  /* --- banner/* (color x weight matrix) --- */
+  /* --- banner/* (color x weight matrix, 6 colors x 3 weights) --- */
   --banner-text-dark: var(--color-grey-1000);
   --banner-text-light: var(--color-grey-white);
   --banner-border-dark: var(--color-grey-1000);
   --banner-border-light: var(--color-grey-200);
 
-  --banner-blue-light: #e9effc;
-  --banner-blue-default: #3572e3;
-  --banner-blue-dark: #184fb4;
-  --banner-lime-light: #f8f6d3;
-  --banner-lime-default: #ebe57a;
-  --banner-lime-dark: #ded421;
-  --banner-purple-light: #f2e9fc;
-  --banner-purple-default: #944ee4;
-  --banner-purple-dark: #611bb1;
-  --banner-teal-light: #e8fafc;
-  --banner-teal-default: #17a6b4;
-  --banner-teal-dark: #127d87;
-  --banner-magenta-light: #fce9f7;
-  --banner-magenta-default: #dc23b1;
-  --banner-magenta-dark: #84156a;
-  --banner-orange-light: #fbf0e9;
-  --banner-orange-default: #de7c45;
-  --banner-orange-dark: #d96726;
+  --banner-blue-light: var(--system-info-light);
+  --banner-blue-default: var(--color-blue-500);
+  --banner-blue-dark: var(--color-blue-700);
+  --banner-lime-light: var(--color-lime-300);
+  --banner-lime-default: var(--color-lime-400);
+  --banner-lime-dark: var(--color-lime-600);
+  --banner-purple-light: var(--brand-purple-light);
+  --banner-purple-default: var(--color-purple-500);
+  --banner-purple-dark: var(--color-purple-700);
+  --banner-teal-light: var(--brand-teal-light);
+  --banner-teal-default: var(--color-teal-500);
+  --banner-teal-dark: var(--color-teal-700);
+  --banner-magenta-light: var(--brand-magenta-light);
+  --banner-magenta-default: var(--color-magenta-600);
+  --banner-magenta-dark: var(--color-magenta-700);
+  --banner-orange-light: var(--brand-orange-light);
+  --banner-orange-default: var(--color-orange-500);
+  --banner-orange-dark: var(--color-orange-600);
 
   /* --- notification/* (shared by Pill, Notification banner, Toast) --- */
-  --notification-spacing: 4px;
-  --notification-padding-horizontal: 8px;
-  --notification-padding-vertical: 4px;
-  --notification-corner-radius: 1000px;
+  --notification-spacing: var(--number-4);
+  --notification-padding-horizontal: var(--number-8);
+  --notification-padding-vertical: var(--number-4);
+  --notification-corner-radius: var(--number-1000);
 
   --notification-content-solid-white: var(--color-grey-white);
   --notification-content-solid-black: var(--color-grey-1000);
 
-  --notification-background-tonal-brand: #fcfbe9;
+  --notification-background-tonal-brand: var(--brand-primary-light);
   --notification-border-brand: #f2eea6;
   --notification-content-brand: #59550d;
   --notification-background-solid-brand: var(--color-lime-600);
@@ -282,52 +367,76 @@
   --notification-content-grey: #808080;
   --notification-background-solid-grey: var(--color-grey-700);
 
-  --notification-background-tonal-info: #e9effc;
+  --notification-background-tonal-info: var(--system-info-light);
   --notification-border-info: #d2e0f9;
-  --notification-content-info: #184fb4;
+  --notification-content-info: var(--color-blue-700);
   --notification-background-solid-info: var(--color-blue-500);
 
-  --notification-background-tonal-teal: #e8fafc;
+  --notification-background-tonal-teal: var(--brand-teal-light);
   --notification-border-teal: #d2f6f9;
   --notification-content-teal: #0c535a;
   --notification-background-solid-teal: var(--color-teal-500);
 
-  --notification-background-tonal-purple: #f2e9fc;
+  --notification-background-tonal-purple: var(--brand-purple-light);
   --notification-border-purple: #e4d3f8;
   --notification-content-purple: #491485;
   --notification-background-solid-purple: var(--color-purple-600);
 
-  --notification-background-tonal-magenta: #fce9f7;
+  --notification-background-tonal-magenta: var(--brand-magenta-light);
   --notification-border-magenta: #f8d3ef;
-  --notification-content-magenta: #84156a;
+  --notification-content-magenta: var(--color-magenta-700);
   --notification-background-solid-magenta: var(--color-magenta-600);
 
-  --notification-background-tonal-orange: #fbf0e9;
+  --notification-background-tonal-orange: var(--brand-orange-light);
   --notification-border-orange: #f7e1d4;
   --notification-content-orange: #ad521f;
   --notification-background-solid-orange: var(--color-orange-600);
 
-  --notification-background-tonal-success: #e9fcf3;
+  --notification-background-tonal-success: var(--system-success-light);
   --notification-border-success: #d3f8e6;
   --notification-content-success: #0d5934;
   --notification-background-solid-success: var(--color-green-solid);
 
-  --notification-background-tonal-warning: #fcf3e8;
+  --notification-background-tonal-warning: var(--system-warning-light);
   --notification-border-warning: #f9e7d2;
   --notification-content-warning: #b56e17;
   --notification-background-solid-warning: var(--color-amber-600);
 
-  --notification-background-tonal-error: #fcebe8;
+  --notification-background-tonal-error: var(--system-error-light);
   --notification-border-error: #f9d6d2;
   --notification-content-error: var(--color-red-600);
   --notification-background-solid-error: var(--color-red-600);
 
   --notification-background-solid-dark: var(--color-grey-1000);
 
-  /* --- navigation/* (tabs) — names confirmed via token index, values not
+  /* --- navigation/* (tabs) — names confirmed via the token index, values not
      directly exercised by the pulled Tab component (it uses selection-control
-     tokens instead), keep as (unconfirmed) placeholders */
-  --navigation-tab-spacing: 4px; /* (unconfirmed) */
+     tokens instead), kept as (unconfirmed) placeholders */
+  --navigation-tab-spacing: var(--number-4); /* (unconfirmed) */
   --navigation-tab-icon-default: var(--color-grey-700); /* (unconfirmed) */
   --navigation-tab-icon-selected: var(--color-grey-1000); /* (unconfirmed) */
+
+  /* --- card/* (used by AffiliateLinkCard, CollectionCard) --- */
+  --card-background: var(--color-grey-white);
+  --card-border: var(--color-grey-200);
+  --card-padding: var(--number-12);
+  --card-corner-radius-card: 16px;
+  --card-corner-radius-image: var(--number-12);
+  --card-corner-radius-tile: var(--number-4);
+  --card-text-primary: var(--color-grey-1000);
+  --card-text-secondary: var(--color-grey-700);
+  --card-text-label: #666666;
+  --card-tile-background: var(--color-grey-100);
+  --card-icon: var(--color-grey-1000); /* (unconfirmed exact hex) */
+
+  /* --- selection-control/* (radio / checkbox / toggle / tabs) --- */
+  --selection-control-action-default: var(--color-grey-700);
+  --selection-control-action-selected: var(--color-grey-1000);
+  --selection-control-background: var(--color-grey-white);
+  --selection-control-border-dark: var(--color-grey-1000);
+  --selection-control-border-grey: var(--color-grey-200);
+  --selection-control-content-dark: var(--color-grey-1000);
+  --selection-control-content-grey: var(--color-grey-700);
+  --selection-control-content-white: var(--color-grey-white);
+  --selection-control-tab-background-selected: var(--color-grey-1000);
 }
