@@ -186,11 +186,13 @@ style pulled.
 | `input-field/padding-vertical` | 8px |
 | `input-field/padding-horizontal-default` | 12px |
 | `input-field/color/surface` | `#FFFFFF` |
-| `input-field/color/border-default` | `#CCCCCC` |
+| `input-field/color/surface-disabled` | `#ECECEC` (flattened from Figma's `rgba(18,18,18,.08)` over white) |
+| `input-field/color/border-default` | `#CCCCCC` (also used for `disabled` — the border is not dimmed) |
 | `input-field/color/border-focused` | `#191919` |
 | `input-field/color/border-error` | `#E43A25` |
 | `input-field/color/input-text` | `#191919` |
-| `input-field/color/input-label` | `#808080` |
+| `input-field/color/input-text-disabled` | `#666666` (`typography/color/grey-dark` — a distinct muted grey, not a faded `input-text`) |
+| `input-field/color/input-label` | `#808080` (also used for `disabled` — the label is not dimmed) |
 | `input-field/color/mandatory-indicator` | `#E43A25` |
 | `input-field/color/error-message` | `#E43A25` |
 | `input-field/color/icon` | `#999999` **(unconfirmed exact hex)** |

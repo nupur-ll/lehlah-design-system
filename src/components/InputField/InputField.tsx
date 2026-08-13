@@ -185,11 +185,15 @@ export default function InputField({
   // prefix-input's 2-line focused/filled/error state) grow taller than its
   // siblings. The label+value stack below uses tightened line-heights so
   // both lines actually fit inside the fixed box instead of being clipped.
+  //
+  // Disabled is NOT a blanket opacity fade in the file — the border and
+  // label stay exactly as in the default state, only the background gets a
+  // subtle grey tint and the value text switches to a distinct muted grey
+  // (see --input-field-color-surface-disabled / -input-text-disabled).
   const containerClasses = [
     "flex h-[52px] w-full items-center gap-1 rounded-[var(--input-field-corner-radius)]",
     "border-[1.5px] border-solid px-[var(--surface-padding-m)] py-[var(--surface-padding-s)]",
-    "bg-[var(--input-field-color-surface)]",
-    isDisabled ? "opacity-60" : "",
+    isDisabled ? "bg-[var(--input-field-color-surface-disabled)]" : "bg-[var(--input-field-color-surface)]",
     borderColor,
   ].join(" ");
 
@@ -197,8 +201,12 @@ export default function InputField({
   // to nothing — used for the label-only default state.
   const collapse = "h-0 overflow-hidden opacity-0 pointer-events-none";
 
-  const controlTextClasses =
-    "w-full truncate bg-transparent text-[length:var(--type-title-medium-size)] leading-[18px] text-[color:var(--input-field-color-input-text)] outline-none";
+  const controlTextClasses = [
+    "w-full truncate bg-transparent text-[length:var(--type-title-medium-size)] leading-[18px] outline-none",
+    isDisabled
+      ? "text-[color:var(--input-field-color-input-text-disabled)]"
+      : "text-[color:var(--input-field-color-input-text)]",
+  ].join(" ");
 
   const labelRow = (
     <label

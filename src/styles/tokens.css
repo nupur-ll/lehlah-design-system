@@ -225,10 +225,14 @@
   --input-field-padding-horizontal-small: 8px; /* (unconfirmed exact px) */
   --input-field-padding-horizontal-default: 12px;
   --input-field-color-surface: var(--color-grey-white);
+  /* flattened from Figma's disabled fill: linear-gradient(rgba(18,18,18,.08), rgba(18,18,18,.08)) over white */
+  --input-field-color-surface-disabled: #ececec;
   --input-field-color-border-default: var(--color-grey-400);
   --input-field-color-border-focused: var(--color-grey-1000);
   --input-field-color-border-error: var(--color-red-600);
   --input-field-color-input-text: var(--color-grey-1000);
+  /* disabled value text is a distinct muted grey, not a dimmed/opacity version of input-text */
+  --input-field-color-input-text-disabled: var(--typography-color-grey-dark);
   --input-field-color-input-label: #808080;
   --input-field-color-mandatory-indicator: var(--color-red-600);
   --input-field-color-error-message: var(--color-red-600);

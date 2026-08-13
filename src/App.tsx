@@ -191,7 +191,7 @@ export default function App() {
                       state={state}
                       label={type === "search-input" ? "Search here" : "Input Label"}
                       value={
-                        state !== "filled" && state !== "error"
+                        state !== "filled" && state !== "error" && state !== "disabled"
                           ? undefined
                           : type === "dropdown-input"
                             ? "Option A"
