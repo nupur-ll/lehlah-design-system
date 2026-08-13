@@ -1,0 +1,329 @@
+/**
+ * LehLah Design System — Design Tokens
+ * ------------------------------------
+ * Source: Figma file "LehLah Design System" (rqHOBBeDnuO6euPeqSJBqV)
+ *
+ * These CSS custom properties are the single source of truth for the whole
+ * component library. Every component in src/components/* reads colors,
+ * spacing, radii and type styles from here — never a hardcoded hex/px value.
+ *
+ * Organized into the same three variable collections the Figma file itself
+ * uses (see docs/TOKENS.md for the full reference table with descriptions):
+ *   1. PRIMITIVES — raw palette values. Never used directly in a component;
+ *      they only exist so semantic/component tokens can reference them.
+ *   2. SEMANTICS  — role-based tokens (typography colors, icon sizes,
+ *      surface colors, selection-control states, notification colors...).
+ *   3. COMPONENTS — component-scoped tokens (button/*, card/*, input-field/*,
+ *      banner/*, notification/* pill & toast colors...).
+ *
+ * Provenance: every value below was extracted from the real generated
+ * Tailwind fallbacks Figma's MCP server returns for each component
+ * (e.g. `bg-[var(--button/color/filled/background,#191919)]` -> #191919),
+ * so these are exact, not eyeballed off the screenshots. A handful of
+ * values that weren't directly exercised by any pulled component are
+ * marked "(unconfirmed)" — cross-check those against Figma before shipping
+ * a screen that depends on them.
+ */
+
+:root {
+  /* ============================================================
+     1. PRIMITIVES — raw palette
+     ============================================================ */
+
+  /* Gray — structural backbone: text, backgrounds, dividers, surfaces */
+  --color-grey-white: #ffffff;
+  --color-grey-100: #f5f5f5;
+  --color-grey-200: #e6e6e6;
+  --color-grey-400: #cccccc;
+  --color-grey-700: #999999;
+  --color-grey-1000: #191919;
+  --color-grey-black: #000000;
+  --color-grey-70: #b2b2b2; /* named "greys/grey-70" in Figma — used for drag handles etc. */
+
+  /* Brand (Lime / "Brand Yellow") — identity only: logo, LEHLAH Score, explainer accents */
+  --color-lime-300: #f8f6d3;
+  --color-lime-400: #ebe57a;
+  --color-lime-500: #e2d939; /* Brand/500 — primary brand shade */
+  --color-lime-600: #ded421;
+
+  /* Purple — Milestone earning type only */
+  --color-purple-400: #af7aeb;
+  --color-purple-500: #944ee4;
+  --color-purple-600: #6e1ec8; /* Purple/600 — primary shade */
+  --color-purple-700: #611bb1;
+
+  /* Magenta — Contest earning type only */
+  --color-magenta-400: #ea7bd0;
+  --color-magenta-500: #e142bc; /* Magenta/500 — primary shade */
+  --color-magenta-600: #dc23b1;
+  --color-magenta-700: #84156a;
+
+  /* Orange — Gifting earning type only */
+  --color-orange-300: #f0c2a8;
+  --color-orange-600: #d96726; /* Orange/600 — primary shade */
+  --color-orange-500: #de7c45;
+
+  /* Blue — Paid Collabs earning type */
+  --color-blue-400: #6292ea;
+  --color-blue-500: #3572e3;
+  --color-blue-600: #1f63e0; /* Blue/600 — primary shade (quick-ref table) */
+  --color-blue-700: #184fb4;
+
+  /* Teal — Opportunities (discovery / exploration) */
+  --color-teal-400: #78e3ed;
+  --color-teal-500: #17a6b4;
+  --color-teal-600: #1dd0e2; /* Teal/600 — primary shade */
+  --color-teal-700: #127d87;
+
+  /* Green — Success / confirmed states only (never motivational) */
+  --color-green-600: #21de83; /* Green/600 — primary shade */
+  --color-green-solid: #1aad66; /* solid/success fill used on buttons, pills, toasts */
+
+  /* Amber — Pending / warning states */
+  --color-amber-600: #e59533; /* Amber/600 — primary shade, also solid/warning fill */
+
+  /* Red — Error / destructive / failure states only, used sparingly */
+  --color-red-600: #e43a25; /* Red/600 — primary shade, also solid/error + destructive-button fill */
+
+  /* Type primitive */
+  --font-name: "Poppins";
+}
+
+:root {
+  /* ============================================================
+     2. SEMANTICS — role-based tokens
+     ============================================================ */
+
+  /* Typography colors */
+  --typography-color-primary: var(--color-grey-1000);
+  --typography-color-secondary: #808080;
+  --typography-color-grey: #808080;
+  --typography-color-grey-dark: #666666;
+  --typography-color-white: var(--color-grey-white);
+
+  /* Type scale — family / weight / size / line-height / letter-spacing.
+     Names mirror Figma's `typography/typescale/{group}/{size}/{weight}` variables. */
+  --type-body-small-size: 11px;
+  --type-body-small-line-height: 16px;
+  --type-body-extra-small-size: 10px;
+  --type-body-extra-small-line-height: 16px;
+  --type-body-medium-size: 12px;
+  --type-body-medium-line-height: 20px;
+  --type-body-large-size: 13px;
+  --type-body-large-line-height: 20px;
+  --type-title-medium-size: 14px;
+  --type-title-medium-line-height: 20px;
+  --type-title-large-size: 16px;
+  --type-title-large-line-height: 20px;
+  --type-letter-spacing: 0px;
+
+  /* Icon sizes (named scale confirmed in the token index; pixel values below
+     are inferred from the sizes actually used across pulled components —
+     cross-check against Figma's `semantics/float/icon/size/*` before relying
+     on xs/xl/xxl in a new screen). */
+  --icon-size-xs: 12px; /* (unconfirmed) */
+  --icon-size-s: 16px;
+  --icon-size-m: 20px;
+  --icon-size-l: 24px;
+  --icon-size-xl: 32px; /* (unconfirmed) */
+  --icon-size-xxl: 40px; /* (unconfirmed) */
+  --icon-color-grey: var(--color-grey-700);
+  --icon-color-dark: var(--color-grey-1000);
+  --icon-color-light: var(--color-grey-white);
+
+  /* Borders */
+  --border-width-thin: 0.5px;
+  --border-width-thick: 1.5px;
+  --border-color-grey: var(--color-grey-200);
+
+  /* Surface spacing / padding / radius scale (multiples of 4, per design rules) */
+  --surface-spacing-xs: 2px;
+  --surface-spacing-s: 4px;
+  --surface-padding-s: 8px;
+  --surface-padding-m: 12px;
+  --surface-radius-s: 8px;
+  --surface-color-page: var(--color-grey-white);
+  --surface-color-container-white: var(--color-grey-white);
+  --number-4: 4px;
+
+  /* Selection controls — radio / checkbox / toggle / tabs */
+  --selection-control-action-default: var(--color-grey-700);
+  --selection-control-action-selected: var(--color-grey-1000);
+  --selection-control-background: var(--color-grey-white);
+  --selection-control-border-dark: var(--color-grey-1000);
+  --selection-control-border-grey: var(--color-grey-200);
+  --selection-control-content-dark: var(--color-grey-1000);
+  --selection-control-content-grey: var(--color-grey-700);
+  --selection-control-content-white: var(--color-grey-white);
+  --selection-control-tab-background-selected: var(--color-grey-1000);
+
+  /* System roles (banners reuse these for their "default"/tint backgrounds) */
+  --system-info-light: #e9effc;
+  --system-success-light: #e9fcf3;
+  --system-warning-light: #fcf3e8;
+  --system-error-light: #fcebe8;
+  --brand-primary-light: #fcfbe9;
+  --brand-purple-light: #f2e9fc;
+  --brand-teal-light: #e8fafc;
+}
+
+:root {
+  /* ============================================================
+     3. COMPONENTS — component-scoped tokens
+     ============================================================ */
+
+  /* --- button/* --- */
+  --button-radius-small: 8px; /* medium + small button sizes */
+  --button-radius-large: 12px; /* large button size */
+  --button-padding-horizontal-small: 16px;
+  --button-padding-horizontal-medium: 20px;
+  --button-padding-horizontal-large: 24px;
+  --button-padding-vertical-small: 8px;
+  --button-padding-vertical-medium: 12px;
+  --button-padding-vertical-large: 16px;
+
+  --button-color-filled-background: var(--color-grey-1000);
+  --button-color-filled-content: var(--color-grey-white);
+  --button-color-filled-overlay: rgba(18, 18, 18, 0.5);
+
+  --button-color-outlined-background: var(--color-grey-white);
+  --button-color-outlined-border: var(--color-grey-1000);
+  --button-color-outlined-content: var(--color-grey-1000);
+  --button-color-outlined-overlay: rgba(18, 18, 18, 0.08);
+
+  --button-color-subtle-background: var(--color-grey-100);
+  --button-color-subtle-content: var(--color-grey-1000);
+  --button-color-subtle-overlay: rgba(18, 18, 18, 0.08);
+
+  --button-color-ghost-content: var(--color-grey-1000);
+
+  --button-color-destructive-background: var(--color-red-600);
+  --button-color-destructive-content: var(--color-grey-white);
+
+  --button-color-success-background: var(--color-green-solid);
+  --button-color-success-content: var(--color-grey-white);
+
+  --button-color-disabled-background: var(--color-grey-400);
+  --button-color-disabled-content: var(--color-grey-white);
+
+  /* --- card/* (used by AffiliateLinkCard, CollectionCard) --- */
+  --card-background: var(--color-grey-white);
+  --card-border: var(--color-grey-200);
+  --card-padding: 12px;
+  --card-corner-radius-card: 16px;
+  --card-corner-radius-image: 12px;
+  --card-corner-radius-tile: 4px;
+  --card-text-primary: var(--color-grey-1000);
+  --card-text-secondary: var(--color-grey-700);
+  --card-text-label: #666666;
+  --card-tile-background: var(--color-grey-100);
+  --card-icon: var(--color-grey-1000); /* (unconfirmed exact hex) */
+
+  /* --- input-field/* --- */
+  --input-field-corner-radius: 8px;
+  --input-field-padding-vertical: 8px;
+  --input-field-padding-horizontal-small: 8px; /* (unconfirmed exact px) */
+  --input-field-padding-horizontal-default: 12px;
+  --input-field-color-surface: var(--color-grey-white);
+  --input-field-color-border-default: var(--color-grey-400);
+  --input-field-color-border-focused: var(--color-grey-1000);
+  --input-field-color-border-error: var(--color-red-600);
+  --input-field-color-input-text: var(--color-grey-1000);
+  --input-field-color-input-label: #808080;
+  --input-field-color-mandatory-indicator: var(--color-red-600);
+  --input-field-color-error-message: var(--color-red-600);
+  --input-field-color-icon: var(--color-grey-700); /* (unconfirmed exact hex) */
+
+  /* --- banner/* (color x weight matrix) --- */
+  --banner-text-dark: var(--color-grey-1000);
+  --banner-text-light: var(--color-grey-white);
+  --banner-border-dark: var(--color-grey-1000);
+  --banner-border-light: var(--color-grey-200);
+
+  --banner-blue-light: #e9effc;
+  --banner-blue-default: #3572e3;
+  --banner-blue-dark: #184fb4;
+  --banner-lime-light: #f8f6d3;
+  --banner-lime-default: #ebe57a;
+  --banner-lime-dark: #ded421;
+  --banner-purple-light: #f2e9fc;
+  --banner-purple-default: #944ee4;
+  --banner-purple-dark: #611bb1;
+  --banner-teal-light: #e8fafc;
+  --banner-teal-default: #17a6b4;
+  --banner-teal-dark: #127d87;
+  --banner-magenta-light: #fce9f7;
+  --banner-magenta-default: #dc23b1;
+  --banner-magenta-dark: #84156a;
+  --banner-orange-light: #fbf0e9;
+  --banner-orange-default: #de7c45;
+  --banner-orange-dark: #d96726;
+
+  /* --- notification/* (shared by Pill, Notification banner, Toast) --- */
+  --notification-spacing: 4px;
+  --notification-padding-horizontal: 8px;
+  --notification-padding-vertical: 4px;
+  --notification-corner-radius: 1000px;
+
+  --notification-content-solid-white: var(--color-grey-white);
+  --notification-content-solid-black: var(--color-grey-1000);
+
+  --notification-background-tonal-brand: #fcfbe9;
+  --notification-border-brand: #f2eea6;
+  --notification-content-brand: #59550d;
+  --notification-background-solid-brand: var(--color-lime-600);
+
+  --notification-background-tonal-grey: var(--color-grey-100);
+  --notification-border-grey: var(--color-grey-100);
+  --notification-content-grey: #808080;
+  --notification-background-solid-grey: var(--color-grey-700);
+
+  --notification-background-tonal-info: #e9effc;
+  --notification-border-info: #d2e0f9;
+  --notification-content-info: #184fb4;
+  --notification-background-solid-info: var(--color-blue-500);
+
+  --notification-background-tonal-teal: #e8fafc;
+  --notification-border-teal: #d2f6f9;
+  --notification-content-teal: #0c535a;
+  --notification-background-solid-teal: var(--color-teal-500);
+
+  --notification-background-tonal-purple: #f2e9fc;
+  --notification-border-purple: #e4d3f8;
+  --notification-content-purple: #491485;
+  --notification-background-solid-purple: var(--color-purple-600);
+
+  --notification-background-tonal-magenta: #fce9f7;
+  --notification-border-magenta: #f8d3ef;
+  --notification-content-magenta: #84156a;
+  --notification-background-solid-magenta: var(--color-magenta-600);
+
+  --notification-background-tonal-orange: #fbf0e9;
+  --notification-border-orange: #f7e1d4;
+  --notification-content-orange: #ad521f;
+  --notification-background-solid-orange: var(--color-orange-600);
+
+  --notification-background-tonal-success: #e9fcf3;
+  --notification-border-success: #d3f8e6;
+  --notification-content-success: #0d5934;
+  --notification-background-solid-success: var(--color-green-solid);
+
+  --notification-background-tonal-warning: #fcf3e8;
+  --notification-border-warning: #f9e7d2;
+  --notification-content-warning: #b56e17;
+  --notification-background-solid-warning: var(--color-amber-600);
+
+  --notification-background-tonal-error: #fcebe8;
+  --notification-border-error: #f9d6d2;
+  --notification-content-error: var(--color-red-600);
+  --notification-background-solid-error: var(--color-red-600);
+
+  --notification-background-solid-dark: var(--color-grey-1000);
+
+  /* --- navigation/* (tabs) — names confirmed via token index, values not
+     directly exercised by the pulled Tab component (it uses selection-control
+     tokens instead), keep as (unconfirmed) placeholders */
+  --navigation-tab-spacing: 4px; /* (unconfirmed) */
+  --navigation-tab-icon-default: var(--color-grey-700); /* (unconfirmed) */
+  --navigation-tab-icon-selected: var(--color-grey-1000); /* (unconfirmed) */
+}
