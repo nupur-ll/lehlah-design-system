@@ -77,6 +77,7 @@ export default function App() {
   const [toggled, setToggled] = useState(true);
   const [tab, setTab] = useState("one");
   const [selectedOptions, setSelectedOptions] = useState<string[]>(["Option A"]);
+  const [city, setCity] = useState("");
 
   return (
     <main className="mx-auto max-w-5xl px-6 py-10">
@@ -158,6 +159,18 @@ export default function App() {
           label-only by design; the value line only appears once a field is focused,
           filled, in error, or disabled.
         </p>
+        <div className="w-[220px]">
+          <p className="mb-1 text-[11px] text-[color:var(--typography-color-secondary)]">
+            try it — dropdown-input opens a real bottom sheet
+          </p>
+          <InputField
+            type="dropdown-input"
+            label="City"
+            value={city}
+            onOptionSelect={setCity}
+            options={["Bengaluru", "Mumbai", "Delhi", "Hyderabad", "Chennai"]}
+          />
+        </div>
         <div className="flex flex-col gap-8">
           {INPUT_FIELD_MATRIX.map(({ type, states }) => (
             <div key={type} className="flex flex-col gap-2">
@@ -177,11 +190,17 @@ export default function App() {
                       type={type}
                       state={state}
                       label={type === "search-input" ? "Search here" : "Input Label"}
-                      value={state === "filled" || state === "error" ? "Input value" : undefined}
+                      value={
+                        state !== "filled" && state !== "error"
+                          ? undefined
+                          : type === "dropdown-input"
+                            ? "Option A"
+                            : "Input value"
+                      }
                       otpValue={type === "otp-input" && (state === "filled" || state === "error") ? "192" : ""}
                       error={state === "error" ? "Input error message" : undefined}
                       disabled={state === "disabled"}
-                      options={type === "dropdown-input" ? ["Option A", "Option B"] : undefined}
+                      options={type === "dropdown-input" ? ["Option A", "Option B", "Option C"] : undefined}
                       actionIcon={type === "action-input" ? <CaretIcon /> : undefined}
                     />
                   </div>

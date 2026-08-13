@@ -1,5 +1,6 @@
 import { useId, useRef, useState } from "react";
 import type { InputHTMLAttributes, ReactNode } from "react";
+import BottomSheet from "../BottomSheet/BottomSheet";
 
 export type InputFieldType =
   | "text-input"
@@ -45,6 +46,10 @@ export interface InputFieldProps
   onAction?: () => void;
   /** dropdown options for `dropdown-input` */
   options?: string[];
+  /** called when an option is picked from the `dropdown-input` bottom sheet */
+  onOptionSelect?: (value: string) => void;
+  /** overrides the bottom sheet's header text for `dropdown-input` (defaults to `label`) */
+  sheetTitle?: string;
   /** country calling code prefix for `prefix-input`, e.g. "+91" */
   prefix?: string;
   /** number of digit boxes for `otp-input` (default 6) */
@@ -74,6 +79,12 @@ const ClearIcon = () => (
   </svg>
 );
 
+const CheckIcon = () => (
+  <svg viewBox="0 0 24 24" fill="none" className="size-5 shrink-0 text-[color:var(--input-field-color-icon)]" aria-hidden>
+    <path d="M5 13l4 4L19 7" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
+  </svg>
+);
+
 /**
  * InputField — LehLah Design System
  * Figma: component set `input-field` (node 724:1449). Covers all 6 types —
@@ -92,6 +103,9 @@ const ClearIcon = () => (
  *   visible in every state.
  * - **search-input** always shows its single line; its trailing icon swaps
  *   from a magnifier to a clear (×) button once the field is filled.
+ * - **dropdown-input** doesn't use a native `<select>` — tapping it opens a
+ *   `BottomSheet` listing every option (matching the app's actual mobile
+ *   picker pattern), and picking one selects it and closes the sheet.
  */
 export default function InputField({
   type = "text-input",
@@ -102,6 +116,8 @@ export default function InputField({
   actionIcon,
   onAction,
   options = [],
+  onOptionSelect,
+  sheetTitle,
   prefix = "+91",
   otpLength = 6,
   otpValue = "",
@@ -117,13 +133,24 @@ export default function InputField({
   ...rest
 }: InputFieldProps) {
   const [focused, setFocused] = useState(false);
+  const [sheetOpen, setSheetOpen] = useState(false);
+  const [internalDropdownValue, setInternalDropdownValue] = useState(
+    typeof defaultValue === "string" ? defaultValue : "",
+  );
   const autoId = useId();
   const inputId = id ?? autoId;
   const otpRefs = useRef<Array<HTMLInputElement | null>>([]);
   const searchInputRef = useRef<HTMLInputElement | null>(null);
   const hasError = Boolean(error);
+  // dropdown-input is never a native controlled/uncontrolled <input> — it's
+  // either fully controlled via `value`, or tracks its own pick internally.
+  const dropdownValue = typeof value === "string" ? value : internalDropdownValue;
   const hasValue =
-    type === "otp-input" ? otpValue.length > 0 : Boolean(value ?? defaultValue);
+    type === "otp-input"
+      ? otpValue.length > 0
+      : type === "dropdown-input"
+        ? Boolean(dropdownValue)
+        : Boolean(value ?? defaultValue);
 
   const derivedState: InputFieldState = disabled
     ? "disabled"
@@ -201,22 +228,21 @@ export default function InputField({
   let leadingPersistent: ReactNode = null;
 
   if (type === "dropdown-input") {
+    // Tapping the field opens a bottom sheet listing every option instead of
+    // a native <select> popup — matches the app's real mobile picker pattern.
     control = (
-      <select
+      <button
+        type="button"
         id={inputId}
         disabled={isDisabled}
-        value={value}
-        defaultValue={defaultValue}
-        onFocus={() => setFocused(true)}
-        onBlur={() => setFocused(false)}
-        className={[controlTextClasses, showValueRow ? "" : collapse].join(" ")}
+        onClick={() => {
+          setFocused(true);
+          setSheetOpen(true);
+        }}
+        className={[controlTextClasses, "text-left", showValueRow ? "" : collapse].join(" ")}
       >
-        {options.map((opt) => (
-          <option key={opt} value={opt}>
-            {opt}
-          </option>
-        ))}
-      </select>
+        {dropdownValue || " "}
+      </button>
     );
     trailingIcon = <CaretDownIcon />;
   } else if (type === "otp-input") {
@@ -395,6 +421,41 @@ export default function InputField({
             {error}
           </p>
         </div>
+      )}
+      {type === "dropdown-input" && (
+        <BottomSheet
+          open={sheetOpen}
+          onClose={() => {
+            setSheetOpen(false);
+            setFocused(false);
+          }}
+          headerText={sheetTitle ?? label}
+          showResetButton={false}
+          showSearch={false}
+          showActions={false}
+        >
+          <div className="flex w-full flex-col items-start py-2">
+            {options.map((opt) => {
+              const isSelected = opt === dropdownValue;
+              return (
+                <button
+                  key={opt}
+                  type="button"
+                  onClick={() => {
+                    if (typeof value !== "string") setInternalDropdownValue(opt);
+                    onOptionSelect?.(opt);
+                    setSheetOpen(false);
+                    setFocused(false);
+                  }}
+                  className="flex h-12 w-full items-center justify-between px-4 py-2 text-left text-[length:var(--type-title-medium-size)] leading-[var(--type-title-medium-line-height)] font-medium text-[color:var(--typography-color-primary)]"
+                >
+                  <span>{opt}</span>
+                  {isSelected && <CheckIcon />}
+                </button>
+              );
+            })}
+          </div>
+        </BottomSheet>
       )}
     </div>
   );
