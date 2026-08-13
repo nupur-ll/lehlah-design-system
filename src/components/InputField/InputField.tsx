@@ -153,15 +153,14 @@ export default function InputField({
           ? "border-[var(--input-field-color-border-focused)]"
           : "border-[var(--input-field-color-border-default)]";
 
-  // prefix-input can grow taller than the base 52px once its second row
-  // (the "+91 Input Number" line) is shown, so it gets min-h instead of a
-  // fixed h, and start-aligned content instead of vertically centered.
-  const isExpandingType = type === "prefix-input";
+  // Every type shares one fixed 52px row height — matching the Figma
+  // file's own container size exactly, rather than letting any type (e.g.
+  // prefix-input's 2-line focused/filled/error state) grow taller than its
+  // siblings. The label+value stack below uses tightened line-heights so
+  // both lines actually fit inside the fixed box instead of being clipped.
   const containerClasses = [
-    "flex w-full items-center gap-1 overflow-hidden rounded-[var(--input-field-corner-radius)]",
-    isExpandingType ? "min-h-[52px] items-start py-[var(--surface-padding-s)]" : "h-[52px]",
-    "border-[1.5px] border-solid px-[var(--surface-padding-m)]",
-    isExpandingType ? "" : "py-[var(--surface-padding-s)]",
+    "flex h-[52px] w-full items-center gap-1 rounded-[var(--input-field-corner-radius)]",
+    "border-[1.5px] border-solid px-[var(--surface-padding-m)] py-[var(--surface-padding-s)]",
     "bg-[var(--input-field-color-surface)]",
     isDisabled ? "opacity-60" : "",
     borderColor,
@@ -172,12 +171,12 @@ export default function InputField({
   const collapse = "h-0 overflow-hidden opacity-0 pointer-events-none";
 
   const controlTextClasses =
-    "w-full truncate bg-transparent text-[length:var(--type-title-medium-size)] leading-[var(--type-title-medium-line-height)] text-[color:var(--input-field-color-input-text)] outline-none";
+    "w-full truncate bg-transparent text-[length:var(--type-title-medium-size)] leading-[18px] text-[color:var(--input-field-color-input-text)] outline-none";
 
   const labelRow = (
     <label
       htmlFor={inputId}
-      className="flex items-center gap-0.5 text-[length:var(--type-body-medium-size)] leading-[var(--type-body-medium-line-height)] text-[color:var(--input-field-color-input-label)]"
+      className="flex items-center gap-0.5 text-[length:var(--type-body-medium-size)] leading-[13px] text-[color:var(--input-field-color-input-label)]"
     >
       {label}
       {mandatory && (
@@ -259,7 +258,9 @@ export default function InputField({
               }
             }}
             className={[
-              "size-10 shrink-0 rounded-[var(--input-field-corner-radius)] border-[1.5px] border-solid",
+              // Fixed height matches every other type's 52px row exactly —
+              // only the width is narrower, so the whole grid lines up.
+              "h-[52px] w-10 shrink-0 rounded-[var(--input-field-corner-radius)] border-[1.5px] border-solid",
               "bg-[var(--input-field-color-surface)] text-center text-[length:var(--type-title-medium-size)]",
               "text-[color:var(--input-field-color-input-text)] outline-none",
               "placeholder:text-[color:var(--input-field-color-input-label)]",
@@ -280,8 +281,8 @@ export default function InputField({
       </span>
     );
     control = (
-      <div className={["flex items-center gap-1", showValueRow ? "pt-0.5" : collapse].join(" ")}>
-        <span className="shrink-0 text-[length:var(--type-title-medium-size)] leading-[var(--type-title-medium-line-height)] text-[color:var(--input-field-color-input-text)]">
+      <div className={["flex items-center gap-1", showValueRow ? "" : collapse].join(" ")}>
+        <span className="shrink-0 text-[length:var(--type-title-medium-size)] leading-[18px] text-[color:var(--input-field-color-input-text)]">
           {prefix}
         </span>
         <input
@@ -376,7 +377,7 @@ export default function InputField({
       ) : (
         <div className={containerClasses}>
           {leadingPersistent}
-          <div className="flex min-w-0 flex-1 flex-col gap-0.5">
+          <div className="flex min-w-0 flex-1 flex-col justify-center gap-0">
             {type === "search-input" ? control : labelRow}
             {type !== "search-input" && control}
           </div>
