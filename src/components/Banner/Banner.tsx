@@ -56,6 +56,7 @@ function isDarkText(color: BannerColor, weight: BannerWeight) {
  * Figma: component set `banner` (node 752:1504). 6 colors x 3 weights, each
  * a 350x150 card with header/subtext/CTA on the left and a 150x150 creative
  * slot on the right.
+ * @category Marketing
  */
 export default function Banner({
   header = "Header Text",

@@ -1,0 +1,28 @@
+{
+  "projectId": "adac91b4-2772-4151-bbed-ccea8b53d84f",
+  "shape": "package",
+  "pkg": "@lehlah/design-system",
+  "buildCmd": "npx tsc --declaration --emitDeclarationOnly --jsx react-jsx --module ESNext --moduleResolution bundler --target ES2020 --skipLibCheck --strict --outDir dist --rootDir src/components src/components/index.ts && npx tailwindcss -i src/styles/index.css -o dist/styles.css --config tailwind.config.ts",
+  "cssEntry": "dist/styles.css",
+  "extraFonts": [".design-sync/fonts/poppins.css"],
+  "readmeHeader": ".design-sync/conventions.md",
+  "overrides": {
+    "BottomSheet": { "cardMode": "single", "viewport": "440x560" },
+    "AffiliateLinkCard": { "cardMode": "column" },
+    "CollectionCard": { "cardMode": "column" }
+  },
+  "componentSrcMap": {
+    "Button": ".design-sync/group-stubs/actions/Button.ts",
+    "IconButton": ".design-sync/group-stubs/actions/IconButton.ts",
+    "RadioButton": ".design-sync/group-stubs/selection-controls/RadioButton.ts",
+    "Checkbox": ".design-sync/group-stubs/selection-controls/Checkbox.ts",
+    "ToggleSwitch": ".design-sync/group-stubs/selection-controls/ToggleSwitch.ts",
+    "Pill": ".design-sync/group-stubs/tags/Pill.ts",
+    "Notification": ".design-sync/group-stubs/feedback/Notification.ts",
+    "Toast": ".design-sync/group-stubs/feedback/Toast.ts",
+    "Tab": ".design-sync/group-stubs/navigation/Tab.ts",
+    "Banner": ".design-sync/group-stubs/marketing/Banner.ts",
+    "InputField": ".design-sync/group-stubs/forms/InputField.ts",
+    "BottomSheet": ".design-sync/group-stubs/overlays/BottomSheet.ts"
+  }
+}

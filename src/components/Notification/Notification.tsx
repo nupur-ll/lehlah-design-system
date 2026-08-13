@@ -68,6 +68,7 @@ function TypeIcon({ type }: { type: NotificationType }) {
  * Figma: component set `notification` (node 793:37). Inline banner-style
  * alert with icon + headline + subtext. For the toast/snackbar variant, see
  * the separate <Toast /> component.
+ * @category Feedback
  */
 export default function Notification({
   headline = "Notification headline text",

@@ -20,6 +20,7 @@ export interface CollectionCardProps {
  * CollectionCard — LehLah Design System
  * Figma: component `collection-card` (node 794:2053). A 2x2 image grid +
  * collection metadata + the same 2-row stats grid used by AffiliateLinkCard.
+ * @category Cards
  */
 export default function CollectionCard({
   collectionName = "Collection Name",

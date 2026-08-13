@@ -66,6 +66,7 @@ const VARIANT: Record<ButtonVariant, string> = {
  * Figma: component set `button` (node 302:641). 3 sizes x 7 visual variants,
  * default/pressed states are expressed here via native `:hover`/`:active`
  * instead of a separate `state` prop, since that maps better to real DOM usage.
+ * @category Actions
  */
 export default function Button({
   children = "Button Text",

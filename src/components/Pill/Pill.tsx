@@ -70,6 +70,7 @@ const FILL: Record<PillType, string> = {
 /**
  * Pill — LehLah Design System
  * Figma: component set `pill` (node 786:389). 11 colors x 2 weights.
+ * @category Tags
  */
 export default function Pill({
   children = "Pill Text",

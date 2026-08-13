@@ -12,6 +12,7 @@ export interface CheckboxProps
  * Figma: component set `CheckBox` (node 223:1391).
  * Native <input type="checkbox"> for real semantics; visuals mirror the
  * Figma "container" (2px radius square, 2px border) + "CheckSquare" glyph.
+ * @category Selection Controls
  */
 export default function Checkbox({
   size = "large",

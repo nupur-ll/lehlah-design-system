@@ -10,6 +10,7 @@ export interface IconButtonProps extends ButtonHTMLAttributes<HTMLButtonElement>
  * Figma: `action` component set (node referenced inside input-field's
  * action-input variant) — a bare 36x36 icon-only tap target used inline in
  * inputs, cards (copy/delete affordances), and toolbars.
+ * @category Actions
  */
 export default function IconButton({ icon, className = "", ...rest }: IconButtonProps) {
   return (

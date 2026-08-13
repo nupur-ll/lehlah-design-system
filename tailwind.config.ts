@@ -10,7 +10,7 @@ import type { Config } from "tailwindcss";
  * tokens.css.
  */
 export default {
-  content: ["./index.html", "./src/**/*.{ts,tsx}"],
+  content: ["./index.html", "./src/**/*.{ts,tsx}", "./.design-sync/previews/**/*.{ts,tsx}"],
   theme: {
     extend: {
       colors: {

@@ -32,6 +32,7 @@ export interface AffiliateLinkCardProps {
  * own expand/collapse UI as children if you need that), `auto-dm` (compact
  * row with drag handle + delete, no stats) and `amazon` (stats replaced by a
  * "no post-level analytics" notice, since Amazon doesn't expose that data).
+ * @category Cards
  */
 export default function AffiliateLinkCard({
   type = "default",

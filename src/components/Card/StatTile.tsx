@@ -4,7 +4,10 @@ export interface StatTileProps {
   prefix?: string;
 }
 
-/** Shared stat tile used by AffiliateLinkCard + CollectionCard's stats grid. */
+/**
+ * Shared stat tile used by AffiliateLinkCard + CollectionCard's stats grid.
+ * @category Cards
+ */
 export default function StatTile({ label, value, prefix }: StatTileProps) {
   return (
     <div className="flex flex-1 flex-col items-center justify-center gap-0 rounded-[var(--card-corner-radius-tile)] bg-[var(--card-tile-background)] p-1">
