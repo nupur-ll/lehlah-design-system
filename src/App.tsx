@@ -166,7 +166,10 @@ export default function App() {
               </h3>
               <div className="flex flex-wrap gap-4">
                 {states.map((state) => (
-                  <div key={state} className="flex w-[220px] flex-col gap-1">
+                  <div
+                    key={state}
+                    className={["flex flex-col gap-1", type === "otp-input" ? "w-[288px]" : "w-[220px]"].join(" ")}
+                  >
                     <span className="text-[11px] text-[color:var(--typography-color-secondary)]">
                       {state}
                     </span>

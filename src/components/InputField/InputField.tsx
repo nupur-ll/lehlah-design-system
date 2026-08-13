@@ -51,6 +51,8 @@ export interface InputFieldProps
   otpLength?: number;
   otpValue?: string;
   onOtpChange?: (value: string) => void;
+  /** called when the trailing clear (×) button on a filled `search-input` is pressed */
+  onClear?: () => void;
 }
 
 const CaretDownIcon = () => (
@@ -66,6 +68,12 @@ const SearchIcon = () => (
   </svg>
 );
 
+const ClearIcon = () => (
+  <svg viewBox="0 0 24 24" fill="none" className="size-full" aria-hidden>
+    <path d="M6 6l12 12M18 6L6 18" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round" />
+  </svg>
+);
+
 /**
  * InputField — LehLah Design System
  * Figma: component set `input-field` (node 724:1449). Covers all 6 types —
@@ -73,12 +81,17 @@ const SearchIcon = () => (
  * prefix (phone number), otp (digit boxes), and search — and gates the
  * available states per type to match the file exactly (see STATES_BY_TYPE).
  *
- * Important quirk carried over from the source file: for every "boxed" type
- * except search-input, the **default** state shows only the small label —
- * there is no visible value/placeholder line until the field becomes
- * focused, filled, in error, or disabled. The underlying control is always
- * mounted (so label-click-to-focus and real typing still work), just
- * visually collapsed while in the default state.
+ * Important quirks carried over from the source file:
+ * - For text/action/dropdown/prefix-input, the **default** state shows only
+ *   the small label — there is no visible value/placeholder line until the
+ *   field becomes focused, filled, in error, or disabled. The underlying
+ *   control is always mounted (so label-click-to-focus and real typing still
+ *   work), just visually collapsed while in the default state.
+ * - **otp-input** is the opposite: it has no label row at all — the digit
+ *   boxes themselves (each showing a "-" placeholder when empty) are always
+ *   visible in every state.
+ * - **search-input** always shows its single line; its trailing icon swaps
+ *   from a magnifier to a clear (×) button once the field is filled.
  */
 export default function InputField({
   type = "text-input",
@@ -100,12 +113,14 @@ export default function InputField({
   defaultValue,
   onFocus,
   onBlur,
+  onClear,
   ...rest
 }: InputFieldProps) {
   const [focused, setFocused] = useState(false);
   const autoId = useId();
   const inputId = id ?? autoId;
   const otpRefs = useRef<Array<HTMLInputElement | null>>([]);
+  const searchInputRef = useRef<HTMLInputElement | null>(null);
   const hasError = Boolean(error);
   const hasValue =
     type === "otp-input" ? otpValue.length > 0 : Boolean(value ?? defaultValue);
@@ -124,8 +139,9 @@ export default function InputField({
   const state: InputFieldState =
     stateOverride && validStates.includes(stateOverride) ? stateOverride : derivedState;
 
-  // search-input never collapses to label-only — every other type does.
-  const showValueRow = type === "search-input" ? true : state !== "default";
+  // search-input and otp-input never collapse to label-only — the others do.
+  const showValueRow =
+    type === "search-input" || type === "otp-input" ? true : state !== "default";
   const isDisabled = state === "disabled";
 
   const borderColor =
@@ -137,10 +153,10 @@ export default function InputField({
           ? "border-[var(--input-field-color-border-focused)]"
           : "border-[var(--input-field-color-border-default)]";
 
-  // prefix-input and otp-input can grow taller than the base 52px once their
-  // second row / digit boxes are shown, so they get min-h instead of a fixed
-  // h, and start-aligned content instead of vertically centered.
-  const isExpandingType = type === "prefix-input" || type === "otp-input";
+  // prefix-input can grow taller than the base 52px once its second row
+  // (the "+91 Input Number" line) is shown, so it gets min-h instead of a
+  // fixed h, and start-aligned content instead of vertically centered.
+  const isExpandingType = type === "prefix-input";
   const containerClasses = [
     "flex w-full items-center gap-1 overflow-hidden rounded-[var(--input-field-corner-radius)]",
     isExpandingType ? "min-h-[52px] items-start py-[var(--surface-padding-s)]" : "h-[52px]",
@@ -160,7 +176,7 @@ export default function InputField({
 
   const labelRow = (
     <label
-      htmlFor={type === "otp-input" ? `${inputId}-0` : inputId}
+      htmlFor={inputId}
       className="flex items-center gap-0.5 text-[length:var(--type-body-medium-size)] leading-[var(--type-body-medium-line-height)] text-[color:var(--input-field-color-input-label)]"
     >
       {label}
@@ -205,17 +221,28 @@ export default function InputField({
     );
     trailingIcon = <CaretDownIcon />;
   } else if (type === "otp-input") {
+    // No label row and no wrapping bordered container for this type — the
+    // boxes themselves are the whole control, always visible, each with a
+    // "-" placeholder when empty. Only the box a user is actually focused
+    // in gets the focused border (native :focus), independent of the
+    // overall computed `state` — matches the file, where only "error"
+    // recolors every box at once.
+    const otpBoxBorder =
+      state === "error"
+        ? "border-[var(--input-field-color-border-error)]"
+        : "border-[var(--input-field-color-border-default)]";
     const digits = Array.from({ length: otpLength }, (_, i) => otpValue[i] ?? "");
     control = (
-      <div className={["flex gap-2 pt-1", showValueRow ? "" : collapse].join(" ")}>
+      <div className="flex gap-2">
         {digits.map((digit, i) => (
           <input
             key={i}
-            id={`${inputId}-${i}`}
+            id={i === 0 ? inputId : `${inputId}-${i}`}
             ref={(el) => (otpRefs.current[i] = el)}
             disabled={isDisabled}
             inputMode="numeric"
             maxLength={1}
+            placeholder="-"
             value={digit}
             onFocus={() => setFocused(true)}
             onBlur={() => setFocused(false)}
@@ -231,7 +258,14 @@ export default function InputField({
                 otpRefs.current[i - 1]?.focus();
               }
             }}
-            className="size-10 rounded-[var(--input-field-corner-radius)] border-[1.5px] border-solid border-[var(--input-field-color-border-default)] bg-[var(--input-field-color-surface)] text-center text-[length:var(--type-title-medium-size)] text-[color:var(--input-field-color-input-text)] outline-none focus:border-[var(--input-field-color-border-focused)]"
+            className={[
+              "size-10 shrink-0 rounded-[var(--input-field-corner-radius)] border-[1.5px] border-solid",
+              "bg-[var(--input-field-color-surface)] text-center text-[length:var(--type-title-medium-size)]",
+              "text-[color:var(--input-field-color-input-text)] outline-none",
+              "placeholder:text-[color:var(--input-field-color-input-label)]",
+              "focus:border-[var(--input-field-color-border-focused)]",
+              otpBoxBorder,
+            ].join(" ")}
           />
         ))}
       </div>
@@ -265,6 +299,7 @@ export default function InputField({
     control = (
       <input
         id={inputId}
+        ref={searchInputRef}
         disabled={isDisabled}
         placeholder={label}
         value={value}
@@ -278,7 +313,32 @@ export default function InputField({
         {...rest}
       />
     );
-    trailingIcon = <SearchIcon />;
+    // Filled swaps the magnifier for a clear (×) button, matching the file.
+    trailingIcon =
+      state === "filled" ? (
+        <button
+          type="button"
+          aria-label="Clear search"
+          className="flex size-5 shrink-0 items-center justify-center text-[color:var(--input-field-color-icon)]"
+          onClick={() => {
+            const el = searchInputRef.current;
+            if (el) {
+              const setter = Object.getOwnPropertyDescriptor(
+                window.HTMLInputElement.prototype,
+                "value",
+              )?.set;
+              setter?.call(el, "");
+              el.dispatchEvent(new Event("input", { bubbles: true }));
+              el.focus();
+            }
+            onClear?.();
+          }}
+        >
+          <ClearIcon />
+        </button>
+      ) : (
+        <SearchIcon />
+      );
   } else {
     // text-input / action-input
     control = (
@@ -309,14 +369,20 @@ export default function InputField({
 
   return (
     <div className={["flex w-full flex-col items-start gap-1", className].join(" ")}>
-      <div className={containerClasses}>
-        {leadingPersistent}
-        <div className="flex min-w-0 flex-1 flex-col gap-0.5">
-          {type === "search-input" ? control : labelRow}
-          {type !== "search-input" && control}
+      {type === "otp-input" ? (
+        // No wrapping bordered container here — Figma just lays the boxes
+        // out directly, each box carrying its own border.
+        control
+      ) : (
+        <div className={containerClasses}>
+          {leadingPersistent}
+          <div className="flex min-w-0 flex-1 flex-col gap-0.5">
+            {type === "search-input" ? control : labelRow}
+            {type !== "search-input" && control}
+          </div>
+          {trailingIcon}
         </div>
-        {trailingIcon}
-      </div>
+      )}
       {hasError && (
         <div className="flex items-center gap-1 text-[color:var(--input-field-color-error-message)]">
           <svg viewBox="0 0 24 24" fill="none" className="size-4 shrink-0" aria-hidden>
