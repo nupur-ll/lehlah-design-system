@@ -1,7 +1,7 @@
 ## Styling idiom — real `var(--token)` arbitrary values, NOT the Tailwind theme shorthands
 
 This design system is Tailwind + React, but its actual styling idiom is **not** ordinary Tailwind theme
-classes. Every real component in this repo (192 occurrences checked) styles itself with Tailwind's
+classes. Every real component in this repo (342 occurrences checked) styles itself with Tailwind's
 **arbitrary-value bracket syntax bound directly to CSS custom properties** — `bg-[var(--token-name)]`,
 `text-[color:var(--token-name)]`, `rounded-[var(--token-name)]`, `text-[length:var(--token-name)]`,
 `gap-[var(--token-name)]`, `px-[var(--surface-spacing-s)]`, `border-[var(--border-width-thin)]`. There
@@ -24,6 +24,29 @@ custom properties on `:root`):
 Nothing in this library reads from React context — there's no `ThemeProvider`/`DesignSystemProvider` to
 wrap anything in. Every component is a plain, self-contained function that reads tokens straight from CSS
 custom properties already defined on `:root` in the bound `styles.css`. Just import and render.
+
+## Selection controls are real inputs — drive them with `checked` + `onChange`
+
+`Checkbox`, `RadioButton`, and `ToggleSwitch` each render a genuine `<input>` (visually hidden) inside a
+wrapping `<label>`, with the visuals drawn in CSS off the `--selection-control-*` tokens. Two consequences
+worth getting right:
+
+- **They are controlled the React way**: pass `checked` and an `onChange` that reads
+  `event.target.checked` (or use `defaultChecked` uncontrolled). There is no `value`-as-label prop and no
+  `onToggle`. `disabled` dims the control to 50% opacity and blocks interaction.
+- **They render no children.** The label text is a *sibling* element, not a child of the control — put the
+  control and its text in a flex row. Passing children does nothing. Group mutually-exclusive
+  `RadioButton`s by giving each the same `name`.
+- `className` lands on the wrapping `<label>`, not on the hidden input, so layout classes work as expected.
+
+```tsx
+<label className="flex items-center gap-[var(--surface-spacing-s)]">
+  <Checkbox size="large" checked={notify} onChange={(e) => setNotify(e.target.checked)} />
+  <span className="text-[length:var(--type-body-medium-size)] text-[color:var(--typography-color-primary)]">
+    Notify me on new orders
+  </span>
+</label>
+```
 
 ## Where the truth lives
 

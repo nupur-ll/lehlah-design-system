@@ -1,15 +1,24 @@
 {
-  "projectId": "adac91b4-2772-4151-bbed-ccea8b53d84f",
+  "projectId": "791d95e5-9f41-419a-8dba-4f83ed20cc8e",
   "shape": "package",
   "pkg": "@lehlah/design-system",
   "buildCmd": "npx tsc --declaration --emitDeclarationOnly --jsx react-jsx --module ESNext --moduleResolution bundler --target ES2020 --skipLibCheck --strict --outDir dist --rootDir src/components src/components/index.ts && npx tailwindcss -i src/styles/index.css -o dist/styles.css --config tailwind.config.ts",
   "cssEntry": "dist/styles.css",
-  "extraFonts": [".design-sync/fonts/poppins.css"],
+  "extraFonts": [
+    ".design-sync/fonts/poppins.css"
+  ],
   "readmeHeader": ".design-sync/conventions.md",
   "overrides": {
-    "BottomSheet": { "cardMode": "single", "viewport": "440x560" },
-    "AffiliateLinkCard": { "cardMode": "column" },
-    "CollectionCard": { "cardMode": "column" }
+    "BottomSheet": {
+      "cardMode": "single",
+      "viewport": "440x560"
+    },
+    "AffiliateLinkCard": {
+      "cardMode": "column"
+    },
+    "CollectionCard": {
+      "cardMode": "column"
+    }
   },
   "componentSrcMap": {
     "Button": ".design-sync/group-stubs/actions/Button.ts",
@@ -24,5 +33,14 @@
     "Banner": ".design-sync/group-stubs/marketing/Banner.ts",
     "InputField": ".design-sync/group-stubs/forms/InputField.ts",
     "BottomSheet": ".design-sync/group-stubs/overlays/BottomSheet.ts"
+  },
+  "entry": "./src/components/index.ts",
+  "dtsPropsFor": {
+    "Button": "  /** Visible label. */\n  children?: React.ReactNode;\n  /** Visual style — maps 1:1 to the Figma `type` variant on the `button` component set. */\n  variant?: \"filled\" | \"outlined\" | \"subtle\" | \"ghost\" | \"destructive\" | \"success\" | \"disabled\";\n  size?: \"small\" | \"medium\" | \"large\";\n  /** Optional icon rendered before/after the label (pass any glyph — LinkSimple in Figma is a placeholder). */\n  leftIcon?: React.ReactNode;\n  rightIcon?: React.ReactNode;\n  /** Click handler, forwarded to the underlying <button>. */\n  onClick?: (event: React.MouseEvent<HTMLButtonElement>) => void;\n  /** Actually blocks interaction. `variant=\"disabled\"` only applies the disabled *styling* — pass both for a truly inert button. */\n  disabled?: boolean;\n  \"aria-label\"?: string;\n  className?: string;\n  id?: string;\n  style?: React.CSSProperties;",
+    "IconButton": "  /** The glyph to render — sized to 28px inside a 36x36 tap target. */\n  icon: React.ReactNode;\n  /** Required: the button has no visible text. */\n  \"aria-label\": string;\n  /** Click handler, forwarded to the underlying <button>. */\n  onClick?: (event: React.MouseEvent<HTMLButtonElement>) => void;\n  disabled?: boolean;\n  className?: string;\n  id?: string;\n  style?: React.CSSProperties;",
+    "Checkbox": "  size?: \"small\" | \"large\";\n  /** Controlled checked state. */\n  checked?: boolean;\n  /** Uncontrolled initial state. */\n  defaultChecked?: boolean;\n  /** Fires on toggle — read `event.target.checked`. */\n  onChange?: (event: React.ChangeEvent<HTMLInputElement>) => void;\n  /** Dims to 50% opacity and blocks interaction. */\n  disabled?: boolean;\n  /** Submitted with the form — the underlying <input type=\"checkbox\"> is real. */\n  value?: string | number;\n  required?: boolean;\n  \"aria-label\"?: string;\n  /** Applied to the wrapping <label>, not the visually-hidden <input>. */\n  className?: string;\n  id?: string;",
+    "ToggleSwitch": "  size?: \"small\" | \"large\";\n  /** Controlled checked state. */\n  checked?: boolean;\n  /** Uncontrolled initial state. */\n  defaultChecked?: boolean;\n  /** Fires on toggle — read `event.target.checked`. */\n  onChange?: (event: React.ChangeEvent<HTMLInputElement>) => void;\n  /** Dims to 50% opacity and blocks interaction. */\n  disabled?: boolean;\n  /** Submitted with the form — the underlying <input type=\"checkbox\"> is real. */\n  value?: string | number;\n  required?: boolean;\n  \"aria-label\"?: string;\n  /** Applied to the wrapping <label>, not the visually-hidden <input>. */\n  className?: string;\n  id?: string;",
+    "RadioButton": "  size?: \"small\" | \"large\";\n  /** Controlled checked state. */\n  checked?: boolean;\n  /** Uncontrolled initial state. */\n  defaultChecked?: boolean;\n  /** Fires on toggle — read `event.target.checked`. */\n  onChange?: (event: React.ChangeEvent<HTMLInputElement>) => void;\n  /** Dims to 50% opacity and blocks interaction. */\n  disabled?: boolean;\n  /** Groups mutually-exclusive radios — give every option in a group the same `name`. */\n  name?: string;\n  /** Submitted with the form — the underlying <input type=\"radio\"> is real. */\n  value?: string | number;\n  required?: boolean;\n  \"aria-label\"?: string;\n  /** Applied to the wrapping <label>, not the visually-hidden <input>. */\n  className?: string;\n  id?: string;",
+    "InputField": "  type?: \"text-input\" | \"action-input\" | \"dropdown-input\" | \"prefix-input\" | \"otp-input\" | \"search-input\";\n  label?: string;\n  mandatory?: boolean;\n  error?: string;\n  /** Force a specific visual state. Mainly for documentation/galleries that need to reproduce Figma's exact variant grid — omit it in real usage and the state derives from disabled / error / focus / value. Ignored if the requested state doesn't exist for this `type`. */\n  state?: \"default\" | \"disabled\" | \"filled\" | \"focused\" | \"error\";\n  /** icon rendered in the trailing 36x36 slot for `action-input` */\n  actionIcon?: React.ReactNode;\n  onAction?: () => void;\n  /** dropdown options for `dropdown-input` */\n  options?: string[];\n  /** called when an option is picked from the `dropdown-input` bottom sheet */\n  onOptionSelect?: (value: string) => void;\n  /** overrides the bottom sheet's header text for `dropdown-input` (defaults to `label`) */\n  sheetTitle?: string;\n  /** country calling code prefix for `prefix-input`, e.g. \"+91\" */\n  prefix?: string;\n  /** number of digit boxes for `otp-input` (default 6) */\n  otpLength?: number;\n  otpValue?: string;\n  onOtpChange?: (value: string) => void;\n  /** called when the trailing clear (×) button on a filled `search-input` is pressed */\n  onClear?: () => void;\n  /** Controlled text value. Drives the derived \"filled\" state. */\n  value?: string | number;\n  defaultValue?: string | number;\n  onChange?: (event: React.ChangeEvent<HTMLInputElement>) => void;\n  onFocus?: (event: React.FocusEvent<HTMLInputElement>) => void;\n  onBlur?: (event: React.FocusEvent<HTMLInputElement>) => void;\n  placeholder?: string;\n  disabled?: boolean;\n  readOnly?: boolean;\n  name?: string;\n  maxLength?: number;\n  autoFocus?: boolean;\n  className?: string;\n  id?: string;\n  style?: React.CSSProperties;"
   }
 }
