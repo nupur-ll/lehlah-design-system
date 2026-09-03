@@ -9,3 +9,10 @@ dist-ssr
 npm-debug.log*
 .vscode/*
 !.vscode/extensions.json
+
+# design-sync
+.ds-sync/
+ds-bundle/
+.design-sync/.cache/
+.design-sync/learnings/
+.design-sync/node_modules

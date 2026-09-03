@@ -10,6 +10,7 @@ export interface ToggleSwitchProps
 /**
  * ToggleSwitch — LehLah Design System
  * Figma: component set `Toggle Switch` (node 223:1408).
+ * @category Selection Controls
  */
 export default function ToggleSwitch({
   size = "large",

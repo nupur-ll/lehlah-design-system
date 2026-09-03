@@ -5,6 +5,7 @@
   "description": "LehLah / Luna design system — React + Tailwind component library generated from the LehLah Design System Figma file, with full design tokens (primitives, semantics, components) documented.",
   "type": "module",
   "main": "src/components/index.ts",
+  "types": "dist/index.d.ts",
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",

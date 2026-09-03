@@ -38,6 +38,7 @@ export interface BottomSheetProps {
  * search, a two-pane filter-category / checkbox-option list, and a sticky
  * Close/Apply action row. Pass `children` instead of `filters` to render
  * fully custom content in the scrollable area.
+ * @category Overlays
  */
 export default function BottomSheet({
   open,

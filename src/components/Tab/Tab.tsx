@@ -16,6 +16,7 @@ export interface TabProps {
  * Figma: component set `tab` (node 992:2900). Two visual families — `pill`
  * (rounded, filled when selected) and `underlined` (flat, bottom-border when
  * selected) — each with a default/selected state.
+ * @category Navigation
  */
 export default function Tab({
   children = "Tab Name",

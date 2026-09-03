@@ -106,6 +106,7 @@ const CheckIcon = () => (
  * - **dropdown-input** doesn't use a native `<select>` — tapping it opens a
  *   `BottomSheet` listing every option (matching the app's actual mobile
  *   picker pattern), and picking one selects it and closes the sheet.
+ * @category Forms
  */
 export default function InputField({
   type = "text-input",

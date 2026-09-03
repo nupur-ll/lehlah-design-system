@@ -12,6 +12,7 @@ export interface RadioButtonProps
  * Figma: component set `Radio Buttons` (node 223:1386).
  * Native <input type="radio"> under the hood for real form semantics/a11y;
  * the ring/dot visuals are drawn with CSS against the selection-control tokens.
+ * @category Selection Controls
  */
 export default function RadioButton({
   size = "large",

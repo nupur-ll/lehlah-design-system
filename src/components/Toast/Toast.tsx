@@ -15,6 +15,7 @@ export interface ToastProps {
  * Figma: component set `Toast` (node 824:240). Dark, floating, single-line
  * snackbar with an optional icon + CTA button. Use for transient feedback;
  * use <Notification /> for anything that should stay inline on the page.
+ * @category Feedback
  */
 export default function Toast({
   text = "Toast title text",
