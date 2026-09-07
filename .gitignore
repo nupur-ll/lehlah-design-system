@@ -2,6 +2,9 @@ node_modules
 dist
 dist-ssr
 *.local
+
+# TypeScript incremental build cache — generated output, churns on every build
+*.tsbuildinfo
 .DS_Store
 .env
 .env.local
