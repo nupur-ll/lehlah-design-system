@@ -74,8 +74,14 @@ export default function AffiliateLinkCard({
             {productImage && <img src={productImage} alt="" className="size-full object-cover" />}
           </div>
           <div className="flex min-w-0 flex-1 flex-col gap-0.5">
-            <p className="truncate text-[11px] text-[color:var(--card-text-secondary)]">{brand}</p>
-            <p className="truncate text-[12px] font-semibold text-[color:var(--card-text-primary)]">{product}</p>
+            {/* body/small/500 */}
+            <p className="truncate text-[length:var(--type-body-small-size)] leading-[var(--type-body-small-line-height)] font-medium text-[color:var(--card-text-secondary)]">
+              {brand}
+            </p>
+            {/* body/medium/600 */}
+            <p className="truncate text-[length:var(--type-body-medium-size)] leading-[var(--type-body-medium-line-height)] font-semibold text-[color:var(--card-text-primary)]">
+              {product}
+            </p>
             <p className="text-[length:var(--type-title-medium-size)] font-bold text-[color:var(--card-text-primary)]">{price}</p>
           </div>
         </div>
@@ -102,12 +108,18 @@ export default function AffiliateLinkCard({
           </div>
           <div className="flex min-w-0 flex-1 flex-col gap-1">
             <div className="flex w-full flex-col gap-0.5">
-              <p className="truncate text-[11px] text-[color:var(--card-text-secondary)]">{brand}</p>
-              <p className="truncate text-[12px] font-semibold text-[color:var(--card-text-primary)]">{product}</p>
+              {/* body/small/500 */}
+              <p className="truncate text-[length:var(--type-body-small-size)] leading-[var(--type-body-small-line-height)] font-medium text-[color:var(--card-text-secondary)]">
+                {brand}
+              </p>
+              {/* body/medium/600 */}
+              <p className="truncate text-[length:var(--type-body-medium-size)] leading-[var(--type-body-medium-line-height)] font-semibold text-[color:var(--card-text-primary)]">
+                {product}
+              </p>
               <p className="text-[length:var(--type-title-medium-size)] font-bold text-[color:var(--card-text-primary)]">{price}</p>
             </div>
             {showCommissionPill && (
-              <span className="inline-flex w-fit items-center gap-1 rounded-[var(--notification-corner-radius)] border border-solid border-[var(--notification-border-brand)] bg-[var(--notification-background-tonal-brand)] px-2 py-1 text-[12px] font-semibold text-[color:var(--notification-content-brand)]">
+              <span className="inline-flex w-fit items-center gap-1 rounded-[var(--notification-corner-radius)] border border-solid border-[var(--notification-border-brand)] bg-[var(--notification-background-tonal-brand)] px-2 py-1 text-[length:var(--type-body-medium-size)] leading-[var(--type-body-medium-line-height)] font-semibold text-[color:var(--notification-content-brand)]">
                 Estimated commissions: ₹{commission}
               </span>
             )}
@@ -144,8 +156,8 @@ export default function AffiliateLinkCard({
           <div className="flex w-full items-center gap-1.5 rounded-[var(--card-corner-radius-image)] bg-[var(--system-info-light)] p-3">
             <div className="flex size-7 shrink-0 items-center justify-center rounded-full bg-white text-[10px] font-bold">a</div>
             <div className="flex min-w-0 flex-1 flex-col gap-1">
-              <p className="text-[12px] text-[color:var(--card-text-primary)]">Amazon doesn’t provide post-level analytics</p>
-              <a href="#" className="text-[12px] font-semibold text-[color:var(--color-blue-500)] underline">
+              <p className="text-[length:var(--type-body-medium-size)] leading-[var(--type-body-medium-line-height)] text-[color:var(--card-text-primary)]">Amazon doesn’t provide post-level analytics</p>
+              <a href="#" className="text-[length:var(--type-body-medium-size)] leading-[var(--type-body-medium-line-height)] font-semibold text-[color:var(--color-blue-500)] underline">
                 View Total Earnings
               </a>
             </div>

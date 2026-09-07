@@ -46,7 +46,8 @@ export default function Toast({
         <button
           type="button"
           onClick={onCtaClick}
-          className="shrink-0 rounded-[var(--button-radius-small)] bg-[#333333] px-2 py-0.5 text-[length:var(--type-body-medium-size)] leading-[var(--type-body-medium-line-height)] font-medium text-[color:var(--notification-content-solid-white)]"
+          // the CTA fill is a raw #333333 in Figma (unbound); grey-900 is that exact value
+          className="shrink-0 rounded-[var(--button-radius-small)] bg-[var(--color-grey-900)] px-2 py-0.5 text-[length:var(--type-body-medium-size)] leading-[var(--type-body-medium-line-height)] font-medium text-[color:var(--notification-content-solid-white)]"
         >
           {cta}
         </button>

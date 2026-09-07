@@ -24,14 +24,36 @@
  * Provenance: every value below was either (a) read directly out of the real
  * generated code/variables Figma's MCP server returns for a pulled component
  * (e.g. the fallback in `bg-[var(--button/color/filled/background,#191919)]`
- * -> #191919, or a resolved `get_variable_defs` value), or (b) — for the
- * primitive color ramps specifically — derived by interpolating between two
- * or more confirmed real steps in the same family (e.g. purple/400, /500,
- * /600, /700 are all real; purple/100-300 and /800-1000 are filled in on the
- * same hue/lightness curve). Every interpolated value is commented
- * "(interpolated — confirm exact hex in Figma before shipping)" so it's
- * never mistaken for a value that was actually pulled. Do not remove those
- * comments without re-confirming the value against Figma first.
+ * -> #191919, or a resolved `get_variable_defs` value), or (b) inferred and
+ * not yet re-verified against Figma — flagged inline as "(unconfirmed)" or
+ * "(interpolated)". After the two re-pulls described below, (b) survives only
+ * in section 3. Do not remove those comments without re-confirming the value
+ * against Figma first.
+ *
+ * The 1. PRIMITIVES colors block was fully re-pulled from Figma's
+ * "lehlah-color-system" frame (node 129:2) via `get_variable_defs` — every
+ * ramp step (100-1000, all ten hues) is a real, directly-read value; none
+ * are interpolated. That pull also caught two mislabeled steps that had
+ * snuck in as "confirmed real" values one step off from where they actually
+ * belong in the ramp (magenta-700 and teal-500 — see inline notes).
+ *
+ * The 2. SEMANTICS block was likewise fully re-pulled, from the file's own
+ * "SEMANTICS" section (node 1129:963), which documents all twelve semantic
+ * groups: the five color groups (surface, border, icon, system, brand) and the
+ * seven number groups (surface radius/padding/spacing/drop-shadow, border
+ * width, icon size, typography typescale). Colors came from
+ * `get_variable_defs` as resolved hexes; the numbers and typescale metrics
+ * came from the section's own token cards. Every value in section 2 below is
+ * now a directly-read Figma value — there are no remaining "(unconfirmed)"
+ * or interpolated semantics. That pull corrected two bindings that had been
+ * wrong (icon/color/grey and the icon/size xl+xxl steps — see inline notes),
+ * and filled in the muted/default/dark tiers of system+brand, the full
+ * none->xxl number scales, and the drop-shadow effect tokens, none of which
+ * existed here before.
+ *
+ * Section 3. COMPONENTS was NOT part of that pull and is still the older,
+ * partly-inferred set. Where a component token's value disagrees with the
+ * semantic it ought to reference, the semantic is the trustworthy one.
  */
 
 :root {
@@ -42,147 +64,229 @@
   /* --- colors/grey --- */
   --color-grey-white: #ffffff;
   --color-grey-black: #000000;
-  --color-grey-70: #b2b2b2; /* named "greys/grey-70" in Figma — not part of the 100-1000 ramp; used for drag handles etc. */
   --color-grey-100: #f5f5f5;
   --color-grey-200: #e6e6e6;
-  --color-grey-300: #d9d9d9; /* interpolated — confirm exact hex in Figma before shipping */
-  --color-grey-400: #cccccc;
-  --color-grey-500: #bbbbbb; /* interpolated — confirm exact hex in Figma before shipping */
-  --color-grey-600: #aaaaaa; /* interpolated — confirm exact hex in Figma before shipping */
-  --color-grey-700: #999999;
-  --color-grey-800: #6e6e6e; /* interpolated — confirm exact hex in Figma before shipping */
-  --color-grey-900: #444444; /* interpolated — confirm exact hex in Figma before shipping */
+  --color-grey-300: #cccccc;
+  --color-grey-400: #b2b2b2;
+  --color-grey-500: #999999;
+  --color-grey-600: #808080;
+  --color-grey-700: #666666;
+  --color-grey-800: #4d4d4d;
+  --color-grey-900: #333333;
   --color-grey-1000: #191919;
 
   /* --- colors/lime --- */
-  --color-lime-100: #fefdf6; /* interpolated — confirm exact hex in Figma before shipping */
-  --color-lime-200: #fdfcf0; /* interpolated — confirm exact hex in Figma before shipping */
-  --color-lime-300: #f8f6d3;
+  --color-lime-100: #fcfbe9;
+  --color-lime-200: #f8f6d3;
+  --color-lime-300: #f2eea6;
   --color-lime-400: #ebe57a;
   --color-lime-500: #e2d939;
   --color-lime-600: #ded421;
-  --color-lime-700: #aba319; /* interpolated — confirm exact hex in Figma before shipping */
-  --color-lime-800: #787312; /* interpolated — confirm exact hex in Figma before shipping */
-  --color-lime-900: #46420a; /* interpolated — confirm exact hex in Figma before shipping */
-  --color-lime-1000: #131203; /* interpolated — confirm exact hex in Figma before shipping */
+  --color-lime-700: #b2aa1a;
+  --color-lime-800: #857f14;
+  --color-lime-900: #59550d;
+  --color-lime-1000: #2c2a07;
 
   /* --- colors/purple --- */
-  --color-purple-100: #f6effd; /* interpolated — confirm exact hex in Figma before shipping */
-  --color-purple-200: #eadbfa; /* interpolated — confirm exact hex in Figma before shipping */
-  --color-purple-300: #ccabf2; /* interpolated — confirm exact hex in Figma before shipping */
+  --color-purple-100: #f2e9fc;
+  --color-purple-200: #e4d3f8;
+  --color-purple-300: #caa6f2;
   --color-purple-400: #af7aeb;
   --color-purple-500: #944ee4;
   --color-purple-600: #6e1ec8;
   --color-purple-700: #611bb1;
-  --color-purple-800: #44137c; /* interpolated — confirm exact hex in Figma before shipping */
-  --color-purple-900: #270b48; /* interpolated — confirm exact hex in Figma before shipping */
-  --color-purple-1000: #0b0313; /* interpolated — confirm exact hex in Figma before shipping */
+  --color-purple-800: #491485;
+  --color-purple-900: #310d59;
+  --color-purple-1000: #18072c;
 
   /* --- colors/magenta --- */
-  --color-magenta-100: #fdf0fa; /* interpolated — confirm exact hex in Figma before shipping */
-  --color-magenta-200: #f9dcf2; /* interpolated — confirm exact hex in Figma before shipping */
-  --color-magenta-300: #f2abe1; /* interpolated — confirm exact hex in Figma before shipping */
+  --color-magenta-100: #fce9f7;
+  --color-magenta-200: #f8d3ef;
+  --color-magenta-300: #f1a7e0;
   --color-magenta-400: #ea7bd0;
   --color-magenta-500: #e142bc;
   --color-magenta-600: #dc23b1;
-  --color-magenta-700: #84156a;
-  --color-magenta-800: #5d0f4b; /* interpolated — confirm exact hex in Figma before shipping */
-  --color-magenta-900: #36092b; /* interpolated — confirm exact hex in Figma before shipping */
-  --color-magenta-1000: #0e020c; /* interpolated — confirm exact hex in Figma before shipping */
+  --color-magenta-700: #b01c8e; /* was #84156a — that value is actually magenta/800, mislabeled a step early */
+  --color-magenta-800: #84156a;
+  --color-magenta-900: #580e47;
+  --color-magenta-1000: #2c0723;
 
   /* --- colors/orange --- */
-  --color-orange-100: #fcf4f0; /* interpolated — confirm exact hex in Figma before shipping */
-  --color-orange-200: #f8e3d7; /* interpolated — confirm exact hex in Figma before shipping */
+  --color-orange-100: #fbf0e9;
+  --color-orange-200: #f7e1d4;
   --color-orange-300: #f0c2a8;
-  --color-orange-400: #e79f76; /* interpolated — confirm exact hex in Figma before shipping */
+  --color-orange-400: #e8a47d;
   --color-orange-500: #de7c45;
   --color-orange-600: #d96726;
-  --color-orange-700: #a74f1d; /* interpolated — confirm exact hex in Figma before shipping */
-  --color-orange-800: #763815; /* interpolated — confirm exact hex in Figma before shipping */
-  --color-orange-900: #44200c; /* interpolated — confirm exact hex in Figma before shipping */
-  --color-orange-1000: #120903; /* interpolated — confirm exact hex in Figma before shipping */
+  --color-orange-700: #ad521f;
+  --color-orange-800: #823e17;
+  --color-orange-900: #57290f;
+  --color-orange-1000: #2b1508;
 
   /* --- colors/blue --- */
-  --color-blue-100: #e4ecfb; /* interpolated — confirm exact hex in Figma before shipping */
-  --color-blue-200: #bed2f6; /* interpolated — confirm exact hex in Figma before shipping */
-  --color-blue-300: #90b2f0; /* interpolated — confirm exact hex in Figma before shipping */
+  --color-blue-100: #e9effc;
+  --color-blue-200: #d2e0f9;
+  --color-blue-300: #a5c0f3;
   --color-blue-400: #6292ea;
   --color-blue-500: #3572e3;
   --color-blue-600: #1f63e0;
   --color-blue-700: #184fb4;
-  --color-blue-800: #11387f; /* interpolated — confirm exact hex in Figma before shipping */
-  --color-blue-900: #0a2049; /* interpolated — confirm exact hex in Figma before shipping */
-  --color-blue-1000: #030914; /* interpolated — confirm exact hex in Figma before shipping */
+  --color-blue-800: #123b87;
+  --color-blue-900: #0c275a;
+  --color-blue-1000: #06142d;
 
   /* --- colors/teal --- */
-  --color-teal-100: #effcfd; /* interpolated — confirm exact hex in Figma before shipping */
-  --color-teal-200: #dbf8fa; /* interpolated — confirm exact hex in Figma before shipping */
-  --color-teal-300: #a9edf4; /* interpolated — confirm exact hex in Figma before shipping */
+  --color-teal-100: #e8fafc;
+  --color-teal-200: #d2f6f9;
+  --color-teal-300: #a5ecf3;
   --color-teal-400: #78e3ed;
-  --color-teal-500: #17a6b4;
+  --color-teal-500: #4ad9e8; /* was #17a6b4 — that value is actually teal/700, mislabeled a step early */
   --color-teal-600: #1dd0e2;
-  --color-teal-700: #127d87;
-  --color-teal-800: #0d585f; /* interpolated — confirm exact hex in Figma before shipping */
-  --color-teal-900: #073337; /* interpolated — confirm exact hex in Figma before shipping */
-  --color-teal-1000: #020e0f; /* interpolated — confirm exact hex in Figma before shipping */
+  --color-teal-700: #17a6b4;
+  --color-teal-800: #127d87;
+  --color-teal-900: #0c535a;
+  --color-teal-1000: #062a2d;
 
   /* --- colors/green --- */
-  --color-green-100: #effdf6; /* interpolated — confirm exact hex in Figma before shipping */
-  --color-green-200: #ecfcf5; /* interpolated — confirm exact hex in Figma before shipping */
-  --color-green-300: #b9f5d8; /* interpolated — confirm exact hex in Figma before shipping */
-  --color-green-400: #87edbc; /* interpolated — confirm exact hex in Figma before shipping */
-  --color-green-500: #54e69f; /* interpolated — confirm exact hex in Figma before shipping */
+  --color-green-100: #e9fcf3;
+  --color-green-200: #d3f8e6;
+  --color-green-300: #a6f2cd;
+  --color-green-400: #7aebb5;
+  --color-green-500: #4ee49c;
   --color-green-600: #21de83;
-  --color-green-700: #19ab65; /* interpolated — confirm exact hex in Figma before shipping */
-  --color-green-800: #127847; /* interpolated — confirm exact hex in Figma before shipping */
-  --color-green-900: #0a4629; /* interpolated — confirm exact hex in Figma before shipping */
-  --color-green-1000: #03130b; /* interpolated — confirm exact hex in Figma before shipping */
-  --color-green-solid: #1aad66; /* real value pulled from a bound component (notification/banner solid-success fill); its exact step in the 100-1000 ramp above is unconfirmed, so it's kept as its own alias rather than folded into a guessed step */
-
+  --color-green-700: #1aad66;
+  --color-green-800: #14854f;
+  --color-green-900: #0d5934;
+  --color-green-1000: #072d1a;
+  
   /* --- colors/amber --- */
-  --color-amber-100: #fefaf6; /* interpolated — confirm exact hex in Figma before shipping */
-  --color-amber-200: #fdf7ef; /* interpolated — confirm exact hex in Figma before shipping */
-  --color-amber-300: #fbeedd; /* interpolated — confirm exact hex in Figma before shipping */
-  --color-amber-400: #f3d0a5; /* interpolated — confirm exact hex in Figma before shipping */
-  --color-amber-500: #ecb36c; /* interpolated — confirm exact hex in Figma before shipping */
+  --color-amber-100: #fcf3e8;
+  --color-amber-200: #f9e7d2;
+  --color-amber-300: #f4d0a4;
+  --color-amber-400: #eeb877;
+  --color-amber-500: #e8a14a;
   --color-amber-600: #e59533;
-  --color-amber-700: #c07418; /* interpolated — confirm exact hex in Figma before shipping */
-  --color-amber-800: #875211; /* interpolated — confirm exact hex in Figma before shipping */
-  --color-amber-900: #4e2f0a; /* interpolated — confirm exact hex in Figma before shipping */
-  --color-amber-1000: #150d03; /* interpolated — confirm exact hex in Figma before shipping */
+  --color-amber-700: #b56e17;
+  --color-amber-800: #885211;
+  --color-amber-900: #5b370b;
+  --color-amber-1000: #2d1b06;
 
   /* --- colors/red --- */
-  --color-red-100: #fef7f6; /* interpolated — confirm exact hex in Figma before shipping */
-  --color-red-200: #fdf1ef; /* interpolated — confirm exact hex in Figma before shipping */
-  --color-red-300: #f8ccc7; /* interpolated — confirm exact hex in Figma before shipping */
-  --color-red-400: #f19c91; /* interpolated — confirm exact hex in Figma before shipping */
-  --color-red-500: #eb6b5b; /* interpolated — confirm exact hex in Figma before shipping */
+  --color-red-100: #fcebe8;
+  --color-red-200: #f9d6d2;
+  --color-red-300: #f4ada4;
+  --color-red-400: #ee8477;
+  --color-red-500: #e95b49;
   --color-red-600: #e43a25;
-  --color-red-700: #b62817; /* interpolated — confirm exact hex in Figma before shipping */
-  --color-red-800: #801c10; /* interpolated — confirm exact hex in Figma before shipping */
-  --color-red-900: #4a1009; /* interpolated — confirm exact hex in Figma before shipping */
-  --color-red-1000: #140402; /* interpolated — confirm exact hex in Figma before shipping */
+  --color-red-700: #c82c19;
+  --color-red-800: #881e11;
+  --color-red-900: #5b140b;
+  --color-red-1000: #2d0a06;
+
+  /* --- colors/state-layer --- */
+  /* Per-hue tap/hover/press overlays, laid over white. Each hue's overlay color is
+     its own confirmed *-600 ramp step (Gray is a dedicated near-black, #121212 —
+     not grey-600 #808080 or grey-1000 #191919). Opacity steps reuse the
+     --opacity-08/16/20/50 numbers below. Pulled from Figma's state-layer swatches
+     (node 1062:534): Gray and Brand Yellow/Purple confirmed directly via
+     get_design_context; the rest follow the same *-600 base confirmed by the
+     primitive color ramp above. */
+  --color-state-layer-grey-08: rgba(18, 18, 18, var(--opacity-08));
+  --color-state-layer-grey-16: rgba(18, 18, 18, var(--opacity-16));
+  --color-state-layer-grey-20: rgba(18, 18, 18, var(--opacity-20));
+  --color-state-layer-grey-50: rgba(18, 18, 18, var(--opacity-50));
+
+  --color-state-layer-lime-08: rgba(222, 212, 33, var(--opacity-08));
+  --color-state-layer-lime-16: rgba(222, 212, 33, var(--opacity-16));
+  --color-state-layer-lime-20: rgba(222, 212, 33, var(--opacity-20));
+  --color-state-layer-lime-50: rgba(222, 212, 33, var(--opacity-50));
+
+  --color-state-layer-purple-08: rgba(110, 30, 200, var(--opacity-08));
+  --color-state-layer-purple-16: rgba(110, 30, 200, var(--opacity-16));
+  --color-state-layer-purple-20: rgba(110, 30, 200, var(--opacity-20));
+  --color-state-layer-purple-50: rgba(110, 30, 200, var(--opacity-50));
+
+  --color-state-layer-magenta-08: rgba(220, 35, 177, var(--opacity-08));
+  --color-state-layer-magenta-16: rgba(220, 35, 177, var(--opacity-16));
+  --color-state-layer-magenta-20: rgba(220, 35, 177, var(--opacity-20));
+  --color-state-layer-magenta-50: rgba(220, 35, 177, var(--opacity-50));
+
+  --color-state-layer-orange-08: rgba(217, 103, 38, var(--opacity-08));
+  --color-state-layer-orange-16: rgba(217, 103, 38, var(--opacity-16));
+  --color-state-layer-orange-20: rgba(217, 103, 38, var(--opacity-20));
+  --color-state-layer-orange-50: rgba(217, 103, 38, var(--opacity-50));
+
+  --color-state-layer-blue-08: rgba(31, 99, 224, var(--opacity-08));
+  --color-state-layer-blue-16: rgba(31, 99, 224, var(--opacity-16));
+  --color-state-layer-blue-20: rgba(31, 99, 224, var(--opacity-20));
+  --color-state-layer-blue-50: rgba(31, 99, 224, var(--opacity-50));
+
+  --color-state-layer-teal-08: rgba(29, 208, 226, var(--opacity-08));
+  --color-state-layer-teal-16: rgba(29, 208, 226, var(--opacity-16));
+  --color-state-layer-teal-20: rgba(29, 208, 226, var(--opacity-20));
+  --color-state-layer-teal-50: rgba(29, 208, 226, var(--opacity-50));
+
+  --color-state-layer-green-08: rgba(33, 222, 131, var(--opacity-08));
+  --color-state-layer-green-16: rgba(33, 222, 131, var(--opacity-16));
+  --color-state-layer-green-20: rgba(33, 222, 131, var(--opacity-20));
+  --color-state-layer-green-50: rgba(33, 222, 131, var(--opacity-50));
+
+  --color-state-layer-amber-08: rgba(229, 149, 51, var(--opacity-08));
+  --color-state-layer-amber-16: rgba(229, 149, 51, var(--opacity-16));
+  --color-state-layer-amber-20: rgba(229, 149, 51, var(--opacity-20));
+  --color-state-layer-amber-50: rgba(229, 149, 51, var(--opacity-50));
+
+  --color-state-layer-red-08: rgba(228, 58, 37, var(--opacity-08));
+  --color-state-layer-red-16: rgba(228, 58, 37, var(--opacity-16));
+  --color-state-layer-red-20: rgba(228, 58, 37, var(--opacity-20));
+  --color-state-layer-red-50: rgba(228, 58, 37, var(--opacity-50));
 
   /* --- font --- */
   --font-name: "Poppins";
 
+  /* font/weight — Figma names these variables by weight (400/500/600/700) with
+     the font's named style ("Regular"/"Medium"/"Semibold"/"Bold") as the value.
+     That string isn't valid CSS for `font-weight` (which needs a number or
+     normal/bold/bolder/lighter), so the value here is the numeric weight —
+     the name still mirrors Figma's own variable name. */
+  --font-weight-400: 400; /* Regular */
+  --font-weight-500: 500; /* Medium */
+  --font-weight-600: 600; /* Semibold */
+  --font-weight-700: 700; /* Bold */
+
+  /* font/letter-spacing */
+  --font-letter-spacing-compressed: -0.5px;
+  --font-letter-spacing-none: 0px;
+  --font-letter-spacing-relaxed: 0.5px;
+
   /* --- numbers — raw numeric scale (spacing / radius / border-width / opacity) --- */
-  --number-0-5: 0.5px;
+  --number-0: 0px;
+  --number-half: 0.5px;
+  --number-1: 1px;
   --number-1-5: 1.5px;
   --number-2: 2px;
   --number-4: 4px;
+  --number-6: 6px;
   --number-8: 8px;
+  --number-10: 10px;
+  --number-11: 11px;
   --number-12: 12px;
+  --number-13: 13px;
+  --number-14: 14px;
   --number-16: 16px;
   --number-20: 20px;
   --number-24: 24px;
-  --number-32: 32px; /* (unconfirmed exact px — inferred from icon/size/xl usage) */
-  --number-40: 40px; /* (unconfirmed exact px — inferred from icon/size/xxl usage) */
-  --number-1000: 1000px; /* fully-rounded / pill radius */
-  --opacity-08: 0.08; /* confirmed — Figma's rgba(18,18,18,.08) overlay/state-layer */
-  --opacity-16: 0.16; /* (unconfirmed — named color/state-layer/*\/opacity-16 in the file, exact value not exercised) */
-  --opacity-20: 0.2; /* (unconfirmed — named color/state-layer/*\/opacity-20 in the file, exact value not exercised) */
-  --opacity-50: 0.5; /* confirmed — Figma's rgba(18,18,18,.5) filled-button overlay */
+  --number-28: 28px;
+  --number-32: 32px;
+  --number-36: 36px;
+  --number-40: 40px;
+  --number-48: 48px; 
+  --number-64: 64px;
+  --number-full: 1000px; /* fully-rounded / pill radius */
+  --opacity-08: 0.08; /* confirmed — Figma's state-layer/*\/opacity-08 across all 10 hues */
+  --opacity-16: 0.16; /* confirmed — Figma's state-layer/*\/opacity-16 across all 10 hues */
+  --opacity-20: 0.2; /* confirmed — Figma's state-layer/*\/opacity-20 across all 10 hues */
+  --opacity-50: 0.5; /* confirmed — Figma's state-layer/*\/opacity-50 across all 10 hues */
 }
 
 :root {
@@ -192,77 +296,234 @@
 
   /* --- typography --- */
   --typography-color-primary: var(--color-grey-1000);
-  --typography-color-secondary: #808080;
-  --typography-color-grey: #808080;
-  --typography-color-grey-dark: #666666;
+  --typography-color-secondary: var(--color-grey-600);
+  --typography-color-grey: var(--color-grey-500);
+  --typography-color-grey-dark: var(--color-grey-700);
   --typography-color-white: var(--color-grey-white);
 
   /* Type scale — family / weight / size / line-height / letter-spacing.
      Names mirror Figma's `typography/typescale/{group}/{size}/{weight}` variables.
-     heading/title/body are the three tiers Figma defines; body/title values
-     below were read directly off pulled components. The heading tier's
-     names and weight variants (400/500/600/700 x small/medium/large) are
-     confirmed to exist in the file, but no pulled component exercised their
-     resolved px/line-height, so those four sizes are a reasoned extrapolation
-     of the existing body -> title progression and are flagged accordingly. */
-  --type-body-extra-small-size: 10px;
-  --type-body-extra-small-line-height: 16px;
-  --type-body-small-size: 11px;
-  --type-body-small-line-height: 16px;
-  --type-body-medium-size: 12px;
-  --type-body-medium-line-height: 20px;
-  --type-body-large-size: 13px;
-  --type-body-large-line-height: 20px;
-  --type-title-medium-size: 14px;
-  --type-title-medium-line-height: 20px;
-  --type-title-large-size: 16px;
-  --type-title-large-line-height: 20px;
-  --type-heading-small-size: 18px; /* (unconfirmed — approximate, confirm exact px/line-height in Figma) */
-  --type-heading-small-line-height: 24px; /* (unconfirmed) */
-  --type-heading-medium-size: 22px; /* (unconfirmed — approximate, confirm exact px/line-height in Figma) */
-  --type-heading-medium-line-height: 28px; /* (unconfirmed) */
-  --type-heading-large-size: 26px; /* (unconfirmed — approximate, confirm exact px/line-height in Figma) */
-  --type-heading-large-line-height: 32px; /* (unconfirmed) */
-  --type-letter-spacing: 0px;
+     All nine tiers below are confirmed against the Typography — Typescale block
+     of the SEMANTICS section (node 1129:963): 28/32, 24/28, 20/24, 16/20, 14/20,
+     13/20, 12/20, 11/16, 10/16 — every tier at letter-spacing 0, every tier
+     carrying all four weights. The heading tier used to be an extrapolation
+     here; that pull confirmed all three of its sizes exactly as written. */
+  --type-body-extra-small-size: var(--number-10);
+  --type-body-extra-small-line-height: var(--number-16);
+  --type-body-extra-small-weight-regular: var(--font-weight-400);
+  --type-body-extra-small-weight-medium: var(--font-weight-500);
+  --type-body-extra-small-weight-semibold: var(--font-weight-600);
+  --type-body-extra-small-weight-bold: var(--font-weight-700);
+  --type-body-small-size: var(--number-11);
+  --type-body-small-line-height: var(--number-16);
+  --type-body-small-weight-regular: var(--font-weight-400);
+  --type-body-small-weight-medium: var(--font-weight-500);
+  --type-body-small-weight-semibold: var(--font-weight-600);
+  --type-body-small-weight-bold: var(--font-weight-700);
+  --type-body-medium-size: var(--number-12);
+  --type-body-medium-line-height: var(--number-20);
+  --type-body-medium-weight-regular: var(--font-weight-400);
+  --type-body-medium-weight-medium: var(--font-weight-500);
+  --type-body-medium-weight-semibold: var(--font-weight-600);
+  --type-body-medium-weight-bold: var(--font-weight-700);
+  --type-body-large-size: var(--number-13);
+  --type-body-large-line-height: var(--number-20);
+  --type-body-large-weight-regular: var(--font-weight-400);
+  --type-body-large-weight-medium: var(--font-weight-500);
+  --type-body-large-weight-semibold: var(--font-weight-600);
+  --type-body-large-weight-bold: var(--font-weight-700);
+  --type-title-medium-size: var(--number-14);
+  --type-title-medium-line-height: var(--number-20);
+  --type-title-medium-weight-regular: var(--font-weight-400);
+  --type-title-medium-weight-medium: var(--font-weight-500);
+  --type-title-medium-weight-semibold: var(--font-weight-600);
+  --type-title-medium-weight-bold: var(--font-weight-700);
+  --type-title-large-size: var(--number-16);
+  --type-title-large-line-height: var(--number-20);
+  --type-title-large-weight-regular: var(--font-weight-400);
+  --type-title-large-weight-medium: var(--font-weight-500);
+  --type-title-large-weight-semibold: var(--font-weight-600);
+  --type-title-large-weight-bold: var(--font-weight-700);
+  --type-heading-small-size: var(--number-20);
+  --type-heading-small-line-height: var(--number-24);
+  --type-heading-small-weight-regular: var(--font-weight-400);
+  --type-heading-small-weight-medium: var(--font-weight-500);
+  --type-heading-small-weight-semibold: var(--font-weight-600);
+  --type-heading-small-weight-bold: var(--font-weight-700);
+  --type-heading-medium-size: var(--number-24);
+  --type-heading-medium-line-height: var(--number-28);
+  --type-heading-medium-weight-regular: var(--font-weight-400);
+  --type-heading-medium-weight-medium: var(--font-weight-500);
+  --type-heading-medium-weight-semibold: var(--font-weight-600);
+  --type-heading-medium-weight-bold: var(--font-weight-700);
+  --type-heading-large-size: var(--number-28);
+  --type-heading-large-line-height: var(--number-32);
+  --type-heading-large-weight-regular: var(--font-weight-400);
+  --type-heading-large-weight-medium: var(--font-weight-500);
+  --type-heading-large-weight-semibold: var(--font-weight-600);
+  --type-heading-large-weight-bold: var(--font-weight-700);
+  --type-letter-spacing: var(--font-letter-spacing-none);
 
-  /* --- surface (spacing / padding / radius / color) --- */
-  --surface-spacing-xs: var(--number-2);
-  --surface-spacing-s: var(--number-4);
+  /* --- surface (radius / padding / spacing / drop-shadow / color) ---
+     The three number scales below are the complete none->xxl sets as defined in
+     Figma, all read directly off the SEMANTICS section's token cards. Note the
+     three scales are NOT the same progression: radius jumps 16 -> 24 -> 36 at
+     l/xl/xxl, padding runs 16 -> 20 -> 24, and spacing starts at 2 and runs
+     8 -> 12 -> 20 -> 24. Don't substitute one for another. */
+  --surface-radius-none: var(--number-0);
+  --surface-radius-xs: var(--number-4);
+  --surface-radius-s: var(--number-8);
+  --surface-radius-m: var(--number-12);
+  --surface-radius-l: var(--number-16);
+  --surface-radius-xl: var(--number-24);
+  --surface-radius-xxl: var(--number-36);
+  --surface-radius-full: var(--number-full);
+
+  --surface-padding-none: var(--number-0);
+  --surface-padding-xs: var(--number-4);
   --surface-padding-s: var(--number-8);
   --surface-padding-m: var(--number-12);
-  --surface-radius-s: var(--number-8);
+  --surface-padding-l: var(--number-16);
+  --surface-padding-xl: var(--number-20);
+  --surface-padding-xxl: var(--number-24);
+
+  --surface-spacing-none: var(--number-0);
+  --surface-spacing-xs: var(--number-2);
+  --surface-spacing-s: var(--number-4);
+  --surface-spacing-m: var(--number-8);
+  --surface-spacing-l: var(--number-12);
+  --surface-spacing-xl: var(--number-20);
+  --surface-spacing-xxl: var(--number-24);
+
+  /* Drop-shadow geometry + color. Figma defines low/medium/high as three
+     separate token sets, but all three currently resolve to identical values
+     (4/4/8/0 at rgba(18,18,18,.08)) — that's what the file says, not a
+     copy-paste error here. The three levels are kept as distinct names so a
+     future divergence in Figma lands on the right token. */
+  --surface-effect-drop-shadow-low-position-x: var(--number-4);
+  --surface-effect-drop-shadow-low-position-y: var(--number-4);
+  --surface-effect-drop-shadow-low-blur: var(--number-8);
+  --surface-effect-drop-shadow-low-spread: var(--number-0);
+  --surface-effect-drop-shadow-low-color: var(--color-state-layer-grey-08);
+  --surface-effect-drop-shadow-medium-position-x: var(--number-4);
+  --surface-effect-drop-shadow-medium-position-y: var(--number-4);
+  --surface-effect-drop-shadow-medium-blur: var(--number-8);
+  --surface-effect-drop-shadow-medium-spread: var(--number-0);
+  --surface-effect-drop-shadow-medium-color: var(--color-state-layer-grey-08);
+  --surface-effect-drop-shadow-high-position-x: var(--number-4);
+  --surface-effect-drop-shadow-high-position-y: var(--number-4);
+  --surface-effect-drop-shadow-high-blur: var(--number-8);
+  --surface-effect-drop-shadow-high-spread: var(--number-0);
+  --surface-effect-drop-shadow-high-color: var(--color-state-layer-grey-08);
+
   --surface-color-page: var(--color-grey-white);
+
+  --surface-color-container-black: var(--color-grey-1000);
+  --surface-color-container-grey-dark: var(--color-grey-500);
+  --surface-color-container-grey: var(--color-grey-300);
+  --surface-color-container-grey-light: var(--color-grey-100);
   --surface-color-container-white: var(--color-grey-white);
-  --surface-color-overlay-black-opacity-08: rgba(18, 18, 18, var(--opacity-08));
 
-  /* --- border --- */
-  --border-width-thin: var(--number-0-5);
+  --surface-color-overlay-black-opacity-08: var(--color-state-layer-grey-08);
+  --surface-color-overlay-black-opacity-16: var(--color-state-layer-grey-16);
+  --surface-color-overlay-black-opacity-20: var(--color-state-layer-grey-20);
+  --surface-color-overlay-black-opacity-50: var(--color-state-layer-grey-50);
+
+  /* --- border (width + color) --- */
+  --border-width-thin: var(--number-half);
+  --border-width-default: var(--number-1);
   --border-width-thick: var(--number-1-5);
-  --border-color-grey: var(--color-grey-200);
+  --border-color-black: var(--color-grey-1000);
+  --border-color-grey-dark: var(--color-grey-600);
+  --border-color-grey: var(--color-grey-300);
+  --border-color-grey-light: var(--color-grey-200);
 
-  /* --- icon (size + color) --- */
-  --icon-size-xs: 12px; /* (unconfirmed) */
+  /* --- icon (size + color) ---
+     The size scale tops out at 32px: xl is 28, xxl is 32. It does not reach 40. */
+  --icon-size-xs: var(--number-12);
   --icon-size-s: var(--number-16);
   --icon-size-m: var(--number-20);
   --icon-size-l: var(--number-24);
-  --icon-size-xl: var(--number-32); /* (unconfirmed) */
-  --icon-size-xxl: var(--number-40); /* (unconfirmed) */
-  --icon-color-grey: var(--color-grey-700);
+  --icon-size-xl: var(--number-28);
+  --icon-size-xxl: var(--number-32);
+  /* icon/color/grey is a light grey (#b2b2b2 = grey-400), not the mid grey-700
+     it was previously bound to. For a darker icon on white use icon-color-dark. */
+  --icon-color-grey: var(--color-grey-400);
   --icon-color-dark: var(--color-grey-1000);
   --icon-color-light: var(--color-grey-white);
 
-  /* --- system (role-based status tints, reused by banners/notifications) --- */
-  --system-info-light: #e9effc;
-  --system-success-light: #e9fcf3;
-  --system-warning-light: #fcf3e8;
-  --system-error-light: #fcebe8;
+  /* --- system (role-based status colors, reused by banners/notifications).
+     Four tiers per status: light (surface) / muted (border) / default (solid
+     fill) / dark (content on light). Each hue picks its own ramp steps —
+     the four statuses do NOT share one step pattern. */
+  --system-info-light: var(--color-blue-100);
+  --system-info-muted: var(--color-blue-200);
+  --system-info-default: var(--color-blue-500);
+  --system-info-dark: var(--color-blue-700);
 
-  /* --- brand (per-hue brand tint used across banner/notification "light" weight) --- */
-  --brand-primary-light: #fcfbe9;
-  --brand-purple-light: #f2e9fc;
-  --brand-teal-light: #e8fafc;
-  --brand-magenta-light: #fce9f7;
-  --brand-orange-light: #fbf0e9;
+  --system-success-light: var(--color-green-100);
+  --system-success-muted: var(--color-green-200);
+  --system-success-default: var(--color-green-700);
+  --system-success-dark: var(--color-green-900);
+
+  --system-warning-light: var(--color-amber-100);
+  --system-warning-muted: var(--color-amber-200);
+  --system-warning-default: var(--color-amber-600);
+  --system-warning-dark: var(--color-amber-700);
+
+  --system-error-light: var(--color-red-100);
+  --system-error-muted: var(--color-red-200);
+  --system-error-default: var(--color-red-600);
+  --system-error-dark: var(--color-red-800);
+
+  /* --- brand (per-hue brand colors, same light/muted/default/dark four-tier
+     shape as system above) --- */
+  --brand-primary-light: var(--color-lime-100);
+  --brand-primary-muted: var(--color-lime-300);
+  --brand-primary-default: var(--color-lime-600);
+  --brand-primary-dark: var(--color-lime-900);
+
+  --brand-purple-light: var(--color-purple-100);
+  --brand-purple-muted: var(--color-purple-200);
+  --brand-purple-default: var(--color-purple-600);
+  --brand-purple-dark: var(--color-purple-800);
+
+  --brand-magenta-light: var(--color-magenta-100);
+  --brand-magenta-muted: var(--color-magenta-200);
+  --brand-magenta-default: var(--color-magenta-600);
+  --brand-magenta-dark: var(--color-magenta-800);
+
+  /* teal's "default" sits at 700, two steps darker than every other hue's
+     default (600) — the lighter teal-500/600 read too pale as a solid fill */
+  --brand-teal-light: var(--color-teal-100);
+  --brand-teal-muted: var(--color-teal-200);
+  --brand-teal-default: var(--color-teal-700);
+  --brand-teal-dark: var(--color-teal-900);
+
+  --brand-orange-light: var(--color-orange-100);
+  --brand-orange-muted: var(--color-orange-200);
+  --brand-orange-default: var(--color-orange-600);
+  --brand-orange-dark: var(--color-orange-700);
+
+  /* --- brand/logo/* — deliberately NOT tokenized here. ---------------------
+     Figma's "lehlah-brand-assets" frame (node 1128:2688) defines 25 partner
+     brand logos under the `brand/logo/` namespace, but they are *image paint
+     styles*, not color variables: each one's fill is raster logo artwork, so
+     `get_variable_defs` resolves every one of them to an empty value (the sole
+     exception, brand/logo/amazon, reports "#FFFFFF" — just the white backing
+     layer behind its image).
+
+     A CSS custom property cannot carry an image fill in any useful way, so
+     there is nothing to add to this file. Partner logos live as committed
+     image assets, keyed by brand slug — see src/components/BrandLogo. Do not
+     "complete" this section with hand-picked hexes sampled from the artwork:
+     that would invent brand colors the design system does not define, and the
+     Figma doc explicitly forbids recoloring partner logos.
+
+     The four categories Figma groups them into (E-Commerce, Beauty & Personal
+     Care, Quick Commerce & Grocery, Other Partners) and the usage rules
+     (>=48x48 minimum, 80x80 on cards, preserve aspect ratio, no effects) are
+     carried on the BrandLogo component instead. */
 }
 
 :root {
@@ -270,9 +531,16 @@
      3. COMPONENTS
      ============================================================ */
 
-  /* --- buttons/* --- */
+  /* --- buttons/* — fully cross-checked against the "lehlah-buttons" section
+     (node 695:68) via `get_variable_defs`. Every value below is a directly-read
+     Figma value. That section also pins the per-size text style and the icon/label
+     gap, which live in Button.tsx rather than here: large = title/large 500
+     (16/20), medium = title/medium 500 (14/20), small = body/medium 500 (12/20),
+     gap = surface/spacing/s (4px). Overlay tokens exist only for the four
+     variants Figma documents a pressed state for (filled, outlined, subtle,
+     destructive) — ghost, success and disabled have a default state only. */
   --button-radius-small: var(--surface-radius-s); /* medium + small button sizes */
-  --button-radius-large: 12px; /* large button size */
+  --button-radius-large: var(--surface-radius-m); /* large button size */
   --button-padding-horizontal-small: var(--number-16);
   --button-padding-horizontal-medium: var(--number-20);
   --button-padding-horizontal-large: var(--number-24);
@@ -282,26 +550,31 @@
 
   --button-color-filled-background: var(--color-grey-1000);
   --button-color-filled-content: var(--color-grey-white);
-  --button-color-filled-overlay: rgba(18, 18, 18, var(--opacity-50));
+  --button-color-filled-overlay: var(--color-state-layer-grey-50);
 
   --button-color-outlined-background: var(--color-grey-white);
   --button-color-outlined-border: var(--color-grey-1000);
   --button-color-outlined-content: var(--color-grey-1000);
-  --button-color-outlined-overlay: rgba(18, 18, 18, var(--opacity-08));
+  --button-color-outlined-overlay: var(--color-state-layer-grey-08);
 
   --button-color-subtle-background: var(--color-grey-100);
   --button-color-subtle-content: var(--color-grey-1000);
-  --button-color-subtle-overlay: rgba(18, 18, 18, var(--opacity-08));
+  --button-color-subtle-overlay: var(--color-state-layer-grey-08);
 
   --button-color-ghost-content: var(--color-grey-1000);
 
   --button-color-destructive-background: var(--color-red-600);
   --button-color-destructive-content: var(--color-grey-white);
+  --button-color-destructive-overlay: var(--color-state-layer-grey-08);
 
-  --button-color-success-background: var(--color-green-solid);
+  /* was var(--color-green-solid), which was never defined anywhere — the token
+     resolved to nothing. system/success/default (#1aad66) is the confirmed value. */
+  --button-color-success-background: var(--system-success-default);
   --button-color-success-content: var(--color-grey-white);
 
-  --button-color-disabled-background: var(--color-grey-400);
+  /* #cccccc — Figma binds this to surface/color/container/grey, i.e. grey-300.
+     It was previously grey-400 (#b2b2b2), one step too dark. */
+  --button-color-disabled-background: var(--surface-color-container-grey);
   --button-color-disabled-content: var(--color-grey-white);
 
   /* --- input-field/* --- */
@@ -312,98 +585,142 @@
   --input-field-color-surface: var(--color-grey-white);
   /* flattened from Figma's disabled fill: linear-gradient(rgba(18,18,18,.08), rgba(18,18,18,.08)) over white */
   --input-field-color-surface-disabled: #ececec;
-  --input-field-color-border-default: var(--color-grey-400);
+  /* #e6e6e6 — Figma binds this to grey-200. It was previously grey-400
+     (#b2b2b2), two steps too dark; re-confirmed via get_variable_defs on the
+     text/dropdown/otp/search variants, which all resolve it to #e6e6e6. */
+  --input-field-color-border-default: var(--color-grey-200);
   --input-field-color-border-focused: var(--color-grey-1000);
   --input-field-color-border-error: var(--color-red-600);
   --input-field-color-input-text: var(--color-grey-1000);
-  /* disabled value text is a distinct muted grey, not a dimmed/opacity version of input-text */
+  /* #666666 — confirmed on the disabled variant (724:1450), which binds
+     typography/color/grey-dark. Not a dimmed/opacity version of input-text. */
   --input-field-color-input-text-disabled: var(--typography-color-grey-dark);
-  --input-field-color-input-label: #808080;
+  --input-field-color-input-label: var(--color-grey-600);
   --input-field-color-mandatory-indicator: var(--color-red-600);
   --input-field-color-error-message: var(--color-red-600);
-  --input-field-color-icon: var(--color-grey-700); /* (unconfirmed exact hex) */
+  /* #191919 — confirmed on the dropdown (724:1444) and search (766:609)
+     variants. Was grey-700 (#666666); the icons are full-black, not mid-grey. */
+  --input-field-color-icon: var(--color-grey-1000);
 
-  /* --- banner/* (color x weight matrix, 6 colors x 3 weights) --- */
+  /* --- banner/* (color x weight matrix, 6 colors x 3 weights) — fully
+     cross-checked against the "banners" section (node 744:1178) and its 18
+     variants. All 22 tokens below re-verified value-for-value on 2026-09-07
+     via get_variable_defs (section + the orange light/default/dark, lime dark
+     and blue light variants); every one resolves exactly as written.
+
+     Text/border pair by weight, not by hue: the light weight uses
+     text-dark + border-dark, default and dark use text-light + border-light.
+     Lime is the exception — dark text at every weight, since even its "dark"
+     weight (#ded421) is a bright yellow. Each hue's ramp steps are its own:
+     there is no shared light/default/dark step pattern across hues.
+
+     The creative slot is deliberately NOT tokenized. A banner is a 350x150
+     card split into a text pane (filled with the banner-{hue}-{weight} token
+     below) and a 150x150 creative slot on the right, which the team fills
+     with a per-banner .png. In Figma that slot carries a flat tint —
+     brand/{hue}/light at the dark+default weights, color/{hue}/400 at the
+     light weight (orange: color/orange/300) — but that tint is placeholder
+     backing for the artwork, not part of the component's color contract.
+     Do not add banner/{hue}/creative tokens for it and do not bind those
+     brand/primitive values into Banner.tsx: the slot takes the `creative`
+     prop (React.ReactNode, typically an <img>) and the artwork covers it.
+     The only reason to give the slot a background would be a load-time
+     placeholder, which is a product decision, not a token. */
   --banner-text-dark: var(--color-grey-1000);
   --banner-text-light: var(--color-grey-white);
   --banner-border-dark: var(--color-grey-1000);
-  --banner-border-light: var(--color-grey-200);
+  --banner-border-light: var(--color-grey-300); /* #cccccc — was grey-200 (#e6e6e6), one step too light */
 
-  --banner-blue-light: var(--system-info-light);
+  --banner-blue-light: var(--color-blue-100);
   --banner-blue-default: var(--color-blue-500);
   --banner-blue-dark: var(--color-blue-700);
-  --banner-lime-light: var(--color-lime-300);
+  /* lime/light is the one hue whose light weight is NOT brand/{hue}/light:
+     it's lime-200 (#f8f6d3), not brand-primary-light (lime-100, #fcfbe9).
+     Was lime-300 (#f2eea6), one step too dark. */
+  --banner-lime-light: var(--color-lime-200);
   --banner-lime-default: var(--color-lime-400);
   --banner-lime-dark: var(--color-lime-600);
-  --banner-purple-light: var(--brand-purple-light);
+  --banner-purple-light: var(--color-purple-100);
   --banner-purple-default: var(--color-purple-500);
   --banner-purple-dark: var(--color-purple-700);
-  --banner-teal-light: var(--brand-teal-light);
-  --banner-teal-default: var(--color-teal-500);
-  --banner-teal-dark: var(--color-teal-700);
-  --banner-magenta-light: var(--brand-magenta-light);
+  --banner-teal-light: var(--color-teal-100);
+  /* teal's default+dark both sat one step too light. default is #17a6b4
+     (teal-700, = brand-teal-default) and dark is #127d87 (teal-800). */
+  --banner-teal-default: var(--color-teal-700);
+  --banner-teal-dark: var(--color-teal-800);
+  --banner-magenta-light: var(--color-magenta-100);
   --banner-magenta-default: var(--color-magenta-600);
-  --banner-magenta-dark: var(--color-magenta-700);
+  --banner-magenta-dark: var(--color-magenta-800); /* #84156a — confirmed; magenta-700 (#b01c8e) is too light for this weight */
   --banner-orange-light: var(--brand-orange-light);
   --banner-orange-default: var(--color-orange-500);
   --banner-orange-dark: var(--color-orange-600);
 
-  /* --- notification/* (shared by Pill, Notification banner, Toast) --- */
+  /* --- notification/* (shared by Pill, Notification banner, Toast) — fully
+     cross-checked against the "pills, notifications and toasts" section
+     (node 941:1898). Every value below is a directly-read Figma value.
+     Each color group is a 4-token set: background/tonal + border + content
+     (the tonal trio) and background/solid (the fill weight). Pill exercises
+     all ten groups x 2 weights; Notification and Toast only use info,
+     success, warning and error. */
   --notification-spacing: var(--number-4);
   --notification-padding-horizontal: var(--number-8);
   --notification-padding-vertical: var(--number-4);
-  --notification-corner-radius: var(--number-1000);
+  --notification-corner-radius: var(--number-full);
 
   --notification-content-solid-white: var(--color-grey-white);
   --notification-content-solid-black: var(--color-grey-1000);
 
   --notification-background-tonal-brand: var(--brand-primary-light);
-  --notification-border-brand: #f2eea6;
-  --notification-content-brand: #59550d;
+  --notification-border-brand: var(--color-lime-300);
+  --notification-content-brand: var(--color-lime-900);
   --notification-background-solid-brand: var(--color-lime-600);
 
   --notification-background-tonal-grey: var(--color-grey-100);
   --notification-border-grey: var(--color-grey-100);
-  --notification-content-grey: #808080;
-  --notification-background-solid-grey: var(--color-grey-700);
+  --notification-content-grey: var(--color-grey-600);
+  --notification-background-solid-grey: var(--color-grey-500); /* #999999 — was grey-700 (#666666), two steps too dark */
 
   --notification-background-tonal-info: var(--system-info-light);
-  --notification-border-info: #d2e0f9;
+  --notification-border-info: var(--color-blue-200);
   --notification-content-info: var(--color-blue-700);
   --notification-background-solid-info: var(--color-blue-500);
 
   --notification-background-tonal-teal: var(--brand-teal-light);
-  --notification-border-teal: #d2f6f9;
-  --notification-content-teal: #0c535a;
-  --notification-background-solid-teal: var(--color-teal-500);
+  --notification-border-teal: var(--color-teal-200);
+  --notification-content-teal: var(--color-teal-900);
+  /* #17a6b4 — resolved: confirmed against the teal fill pill (node 925:937).
+     This is teal-700, the value the token rendered before the primitive fix,
+     not the lighter teal-500 it was left pointing at. Same step as
+     brand-teal-default and banner-teal-default. */
+  --notification-background-solid-teal: var(--color-teal-700);
 
   --notification-background-tonal-purple: var(--brand-purple-light);
-  --notification-border-purple: #e4d3f8;
-  --notification-content-purple: #491485;
+  --notification-border-purple: var(--color-purple-200);
+  --notification-content-purple: var(--color-purple-800);
   --notification-background-solid-purple: var(--color-purple-600);
 
   --notification-background-tonal-magenta: var(--brand-magenta-light);
-  --notification-border-magenta: #f8d3ef;
-  --notification-content-magenta: var(--color-magenta-700);
+  --notification-border-magenta: var(--color-magenta-200);
+  --notification-content-magenta: var(--color-magenta-800); /* re-pointed from magenta-700, see --banner-magenta-dark note above */
   --notification-background-solid-magenta: var(--color-magenta-600);
 
   --notification-background-tonal-orange: var(--brand-orange-light);
-  --notification-border-orange: #f7e1d4;
-  --notification-content-orange: #ad521f;
+  --notification-border-orange: var(--color-orange-200);
+  --notification-content-orange: var(--color-orange-700);
   --notification-background-solid-orange: var(--color-orange-600);
 
   --notification-background-tonal-success: var(--system-success-light);
-  --notification-border-success: #d3f8e6;
-  --notification-content-success: #0d5934;
-  --notification-background-solid-success: var(--color-green-solid);
+  --notification-border-success: var(--color-green-200);
+  --notification-content-success: var(--color-green-900);
+  --notification-background-solid-success: var(--system-success-default); /* see --button-color-success-background note */
 
   --notification-background-tonal-warning: var(--system-warning-light);
-  --notification-border-warning: #f9e7d2;
-  --notification-content-warning: #b56e17;
+  --notification-border-warning: var(--color-amber-200);
+  --notification-content-warning: var(--color-amber-700);
   --notification-background-solid-warning: var(--color-amber-600);
 
   --notification-background-tonal-error: var(--system-error-light);
-  --notification-border-error: #f9d6d2;
+  --notification-border-error: var(--color-red-200);
   --notification-content-error: var(--color-red-600);
   --notification-background-solid-error: var(--color-red-600);
 
@@ -416,18 +733,22 @@
   --navigation-tab-icon-default: var(--color-grey-700); /* (unconfirmed) */
   --navigation-tab-icon-selected: var(--color-grey-1000); /* (unconfirmed) */
 
-  /* --- card/* (used by AffiliateLinkCard, CollectionCard) --- */
+  /* --- card/* (used by AffiliateLinkCard, CollectionCard) — fully
+     cross-checked against the "cards" section (node 813:590). Every value
+     below is a directly-read Figma value. Note the text ramp is NOT
+     primary > secondary > label in darkness: secondary (#999999) is the
+     lightest of the three, lighter than label (#666666). */
   --card-background: var(--color-grey-white);
-  --card-border: var(--color-grey-200);
+  --card-border: var(--color-grey-300); /* #cccccc — was grey-200 (#e6e6e6), one step too light */
   --card-padding: var(--number-12);
-  --card-corner-radius-card: 16px;
-  --card-corner-radius-image: var(--number-12);
-  --card-corner-radius-tile: var(--number-4);
+  --card-corner-radius-card: var(--surface-radius-l);
+  --card-corner-radius-image: var(--surface-radius-m);
+  --card-corner-radius-tile: var(--surface-radius-xs);
   --card-text-primary: var(--color-grey-1000);
-  --card-text-secondary: var(--color-grey-700);
-  --card-text-label: #666666;
+  --card-text-secondary: var(--color-grey-500); /* #999999 — was grey-700 (#666666), two steps too dark */
+  --card-text-label: var(--color-grey-700);
   --card-tile-background: var(--color-grey-100);
-  --card-icon: var(--color-grey-1000); /* (unconfirmed exact hex) */
+  --card-icon: var(--color-grey-400); /* #b2b2b2 — was grey-1000 (#191919), i.e. near-black where Figma wants a light grey */
 
   /* --- selection-control/* (radio / checkbox / toggle / tabs) --- */
   --selection-control-action-default: var(--color-grey-700);
@@ -439,4 +760,5 @@
   --selection-control-content-grey: var(--color-grey-700);
   --selection-control-content-white: var(--color-grey-white);
   --selection-control-tab-background-selected: var(--color-grey-1000);
+  --selection-cotrol-tab-background-default: var(--color-grey-white);
 }

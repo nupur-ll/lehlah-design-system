@@ -37,3 +37,18 @@ export type { AffiliateLinkCardProps, AffiliateLinkCardType, CollectionCardProps
 
 export { default as BottomSheet } from "./BottomSheet";
 export type { BottomSheetProps, FilterGroup } from "./BottomSheet";
+
+export { default as BrandLogo } from "./BrandLogo";
+export {
+  BRAND_LOGOS,
+  BRAND_LOGO_NAMES,
+  BRAND_LOGO_CATEGORY_LABELS,
+  brandLogosByCategory,
+} from "./BrandLogo";
+export type {
+  BrandLogoProps,
+  BrandLogoSize,
+  BrandLogoName,
+  BrandLogoCategory,
+  BrandLogoEntry,
+} from "./BrandLogo";

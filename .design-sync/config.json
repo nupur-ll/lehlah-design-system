@@ -2,7 +2,7 @@
   "projectId": "791d95e5-9f41-419a-8dba-4f83ed20cc8e",
   "shape": "package",
   "pkg": "@lehlah/design-system",
-  "buildCmd": "npx tsc --declaration --emitDeclarationOnly --jsx react-jsx --module ESNext --moduleResolution bundler --target ES2020 --skipLibCheck --strict --outDir dist --rootDir src/components src/components/index.ts && npx tailwindcss -i src/styles/index.css -o dist/styles.css --config tailwind.config.ts",
+  "buildCmd": "npx tsc --declaration --emitDeclarationOnly --jsx react-jsx --module ESNext --moduleResolution bundler --target ES2020 --skipLibCheck --strict --types vite/client,react,react-dom --outDir dist --rootDir src/components src/components/index.ts && npx tailwindcss -i src/styles/index.css -o dist/styles.css --config tailwind.config.ts",
   "cssEntry": "dist/styles.css",
   "extraFonts": [
     ".design-sync/fonts/poppins.css"
@@ -18,6 +18,9 @@
     },
     "CollectionCard": {
       "cardMode": "column"
+    },
+    "BrandLogo": {
+      "cardMode": "column"
     }
   },
   "componentSrcMap": {
@@ -32,7 +35,8 @@
     "Tab": ".design-sync/group-stubs/navigation/Tab.ts",
     "Banner": ".design-sync/group-stubs/marketing/Banner.ts",
     "InputField": ".design-sync/group-stubs/forms/InputField.ts",
-    "BottomSheet": ".design-sync/group-stubs/overlays/BottomSheet.ts"
+    "BottomSheet": ".design-sync/group-stubs/overlays/BottomSheet.ts",
+    "BrandLogo": ".design-sync/group-stubs/brand/BrandLogo.ts"
   },
   "entry": "./src/components/index.ts",
   "dtsPropsFor": {

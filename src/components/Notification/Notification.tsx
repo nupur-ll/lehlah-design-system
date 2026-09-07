@@ -80,7 +80,9 @@ export default function Notification({
   return (
     <div
       className={[
-        "flex w-[358px] items-center gap-2 rounded-xl border border-solid px-3 py-2 shadow-[0px_0px_4px_rgba(0,0,0,0.02)]",
+        // the 0/0/4 @ 2% shadow is a raw value in Figma too — deliberately NOT
+        // one of the surface/effect/drop-shadow tokens (those are 4/4/8 @ 8%).
+        "flex w-[358px] items-center gap-2 rounded-[var(--surface-radius-m)] border border-solid px-3 py-2 shadow-[0px_0px_4px_rgba(0,0,0,0.02)]",
         s.bg,
         s.border,
         className,
@@ -90,16 +92,19 @@ export default function Notification({
         <TypeIcon type={type} />
       </span>
       <div className="flex min-w-0 flex-1 flex-col gap-0.5">
+        {/* body/large/600 */}
         <p
           className={[
             "truncate font-semibold",
-            "text-[13px] leading-[var(--type-body-large-line-height)]",
+            "text-[length:var(--type-body-large-size)] leading-[var(--type-body-large-line-height)]",
             s.content,
           ].join(" ")}
         >
           {headline}
         </p>
-        <p className="truncate text-[length:var(--type-body-medium-size)] leading-[var(--type-body-medium-line-height)] text-[color:var(--typography-color-secondary)]">
+        {/* body/medium/400 in typography/color/grey-dark — #666666, not the
+            #808080 secondary this previously used */}
+        <p className="truncate text-[length:var(--type-body-medium-size)] leading-[var(--type-body-medium-line-height)] text-[color:var(--typography-color-grey-dark)]">
           {subtext}
         </p>
       </div>
