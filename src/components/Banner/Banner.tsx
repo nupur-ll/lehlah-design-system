@@ -75,17 +75,20 @@ export default function Banner({
   return (
     <div
       className={[
-        "flex h-[150px] w-[350px] items-center overflow-hidden rounded-xl",
+        "flex h-[150px] w-[350px] items-center gap-[var(--surface-spacing-s)] overflow-hidden",
+        "rounded-[var(--surface-radius-m)]",
         BG[color][weight],
         className,
       ].join(" ")}
     >
       <div className="flex h-full flex-1 flex-col items-start justify-between p-3">
         <div className={["flex flex-col gap-[7px]", textColor].join(" ")}>
-          <p className="w-full truncate text-[16px] font-bold leading-[var(--type-title-large-line-height)]">
+          {/* title/large/700 */}
+          <p className="w-full truncate text-[length:var(--type-title-large-size)] font-bold leading-[var(--type-title-large-line-height)]">
             {header}
           </p>
-          <p className="w-full truncate text-[12px] leading-[var(--type-body-medium-line-height)]">
+          {/* body/medium/400 */}
+          <p className="w-full truncate text-[length:var(--type-body-medium-size)] leading-[var(--type-body-medium-line-height)]">
             {subtext}
           </p>
         </div>
@@ -93,7 +96,9 @@ export default function Banner({
           type="button"
           onClick={onCtaClick}
           className={[
-            "rounded-full border border-solid px-2 py-1 text-[12px] font-semibold leading-[var(--type-body-medium-line-height)]",
+            /* body/medium/600 */
+            "rounded-[var(--surface-radius-full)] border-[length:var(--border-width-default)] border-solid px-2 py-1",
+            "text-[length:var(--type-body-medium-size)] font-semibold leading-[var(--type-body-medium-line-height)]",
             borderColor,
             textColor,
           ].join(" ")}

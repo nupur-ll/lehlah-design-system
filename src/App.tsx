@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { CaretDown, Trash } from "@phosphor-icons/react";
 import {
   Button,
   RadioButton,
@@ -14,6 +15,9 @@ import {
   AffiliateLinkCard,
   CollectionCard,
   BottomSheet,
+  BrandLogo,
+  BRAND_LOGO_CATEGORY_LABELS,
+  brandLogosByCategory,
 } from "./components";
 import type {
   ButtonVariant,
@@ -27,6 +31,7 @@ import type {
   AffiliateLinkCardType,
   InputFieldType,
   InputFieldState,
+  BrandLogoCategory,
 } from "./components";
 
 const BUTTON_VARIANTS: ButtonVariant[] = [
@@ -97,7 +102,6 @@ const PRIMITIVE_GROUPS: { name: string; swatches: { label: string; token: string
       { label: "white", token: "--color-grey-white" },
       ...rampSwatches("grey"),
       { label: "black", token: "--color-grey-black" },
-      { label: "70", token: "--color-grey-70" },
     ],
   },
   { name: "Lime", swatches: rampSwatches("lime") },
@@ -106,10 +110,7 @@ const PRIMITIVE_GROUPS: { name: string; swatches: { label: string; token: string
   { name: "Orange", swatches: rampSwatches("orange") },
   { name: "Blue", swatches: rampSwatches("blue") },
   { name: "Teal", swatches: rampSwatches("teal") },
-  {
-    name: "Green",
-    swatches: [...rampSwatches("green"), { label: "solid", token: "--color-green-solid" }],
-  },
+  { name: "Green", swatches: rampSwatches("green") },
   { name: "Amber", swatches: rampSwatches("amber") },
   { name: "Red", swatches: rampSwatches("red") },
 ];
@@ -136,33 +137,38 @@ const SEMANTIC_COLOR_GROUPS: { name: string; swatches: { label: string; token: s
   },
   {
     name: "Border",
-    swatches: [{ label: "border-grey", token: "--border-color-grey" }],
+    swatches: [
+      { label: "black", token: "--border-color-black" },
+      { label: "grey-dark", token: "--border-color-grey-dark" },
+      { label: "grey", token: "--border-color-grey" },
+      { label: "grey-light", token: "--border-color-grey-light" },
+    ],
   },
   {
     name: "Icon",
     swatches: [
-      { label: "icon-grey", token: "--icon-color-grey" },
       { label: "icon-dark", token: "--icon-color-dark" },
+      { label: "icon-grey", token: "--icon-color-grey" },
+      { label: "icon-light", token: "--icon-color-light" },
     ],
   },
   {
     name: "System",
-    swatches: [
-      { label: "info-light", token: "--system-info-light" },
-      { label: "success-light", token: "--system-success-light" },
-      { label: "warning-light", token: "--system-warning-light" },
-      { label: "error-light", token: "--system-error-light" },
-    ],
+    swatches: ["info", "success", "warning", "error"].flatMap((status) =>
+      ["light", "muted", "default", "dark"].map((tier) => ({
+        label: `${status}-${tier}`,
+        token: `--system-${status}-${tier}`,
+      })),
+    ),
   },
   {
     name: "Brand",
-    swatches: [
-      { label: "primary-light", token: "--brand-primary-light" },
-      { label: "purple-light", token: "--brand-purple-light" },
-      { label: "teal-light", token: "--brand-teal-light" },
-      { label: "magenta-light", token: "--brand-magenta-light" },
-      { label: "orange-light", token: "--brand-orange-light" },
-    ],
+    swatches: ["primary", "purple", "magenta", "teal", "orange"].flatMap((hue) =>
+      ["light", "muted", "default", "dark"].map((tier) => ({
+        label: `${hue}-${tier}`,
+        token: `--brand-${hue}-${tier}`,
+      })),
+    ),
   },
 ];
 
@@ -179,37 +185,22 @@ const TYPE_SCALE: { name: string; sizeToken: string; lineHeightToken: string; we
   { name: "body/extra-small", sizeToken: "--type-body-extra-small-size", lineHeightToken: "--type-body-extra-small-line-height", weight: "400" },
 ];
 
+const NUMBER_STEPS = ["none", "xs", "s", "m", "l", "xl", "xxl"];
+
 const SPACING_SCALE = [
-  { label: "spacing-xs", token: "--surface-spacing-xs" },
-  { label: "spacing-s", token: "--surface-spacing-s" },
-  { label: "padding-s", token: "--surface-padding-s" },
-  { label: "padding-m", token: "--surface-padding-m" },
+  ...NUMBER_STEPS.map((step) => ({ label: `spacing-${step}`, token: `--surface-spacing-${step}` })),
+  ...NUMBER_STEPS.map((step) => ({ label: `padding-${step}`, token: `--surface-padding-${step}` })),
 ];
 
 const RADIUS_SCALE = [
-  { label: "radius-s", token: "--surface-radius-s" },
+  ...NUMBER_STEPS.map((step) => ({ label: `radius-${step}`, token: `--surface-radius-${step}` })),
+  { label: "radius-full", token: "--surface-radius-full" },
   { label: "input-field radius", token: "--input-field-corner-radius" },
   { label: "button radius (s/m)", token: "--button-radius-small" },
   { label: "button radius (l)", token: "--button-radius-large" },
   { label: "card radius", token: "--card-corner-radius-card" },
   { label: "pill radius", token: "--notification-corner-radius" },
 ];
-
-function CaretIcon() {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" className="size-full" aria-hidden>
-      <path d="M6 9l6 6 6-6" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  );
-}
-
-function TrashIcon() {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" className="size-full" aria-hidden>
-      <path d="M5 7h14M9 7V5a1 1 0 011-1h4a1 1 0 011 1v2m2 0v13a1.5 1.5 0 01-1.5 1.5h-9A1.5 1.5 0 016 20V7" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  );
-}
 
 function Section({ title, description, children }: { title: string; description?: string; children: React.ReactNode }) {
   return (
@@ -480,8 +471,8 @@ export default function App() {
       </Section>
 
       <Section title="Icon button" description="Bare 36×36 icon tap target used inline in inputs/cards/toolbars.">
-        <IconButton icon={<TrashIcon />} aria-label="Delete" />
-        <IconButton icon={<CaretIcon />} aria-label="Expand" />
+        <IconButton icon={<Trash weight="regular" className="size-full" />} aria-label="Delete" />
+        <IconButton icon={<CaretDown weight="regular" className="size-full" />} aria-label="Expand" />
       </Section>
 
       <section className="flex flex-col gap-4 border-b border-solid border-[var(--color-grey-200)] py-8">
@@ -536,7 +527,7 @@ export default function App() {
                       error={state === "error" ? "Input error message" : undefined}
                       disabled={state === "disabled"}
                       options={type === "dropdown-input" ? ["Option A", "Option B", "Option C"] : undefined}
-                      actionIcon={type === "action-input" ? <CaretIcon /> : undefined}
+                      actionIcon={type === "action-input" ? <CaretDown weight="regular" className="size-full" /> : undefined}
                     />
                   </div>
                 ))}
@@ -582,6 +573,26 @@ export default function App() {
           }
           onPrimaryAction={() => setSheetOpen(false)}
         />
+      </Section>
+
+      <Section
+        title="Brand logos"
+        description="All 24 approved partner logos, grouped by the four categories Figma defines. These are image paint styles (brand/logo/*), not color tokens — shown at the default 80px."
+      >
+        <div className="flex w-full flex-col gap-4">
+          {(Object.keys(BRAND_LOGO_CATEGORY_LABELS) as BrandLogoCategory[]).map((category) => (
+            <SubRow key={category} label={BRAND_LOGO_CATEGORY_LABELS[category]}>
+              {brandLogosByCategory(category).map((name) => (
+                <div key={name} className="flex w-[100px] flex-col items-center gap-1">
+                  <BrandLogo name={name} />
+                  <span className="w-full truncate text-center text-[10px] text-[color:var(--typography-color-secondary)]">
+                    {name}
+                  </span>
+                </div>
+              ))}
+            </SubRow>
+          ))}
+        </div>
       </Section>
     </main>
   );

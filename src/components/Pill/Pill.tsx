@@ -83,7 +83,9 @@ export default function Pill({
   return (
     <span
       className={[
-        "inline-flex items-center gap-[var(--notification-spacing)]",
+        // Figma pins pill icons to 16px (icon/size/s); without this an icon
+        // that sizes itself in em would inherit the 12px label size instead.
+        "inline-flex items-center gap-[var(--notification-spacing)] [&_svg]:size-[var(--icon-size-s)]",
         "px-[var(--notification-padding-horizontal)] py-[var(--notification-padding-vertical)]",
         "rounded-[var(--notification-corner-radius)]",
         "text-[length:var(--type-body-medium-size)] leading-[var(--type-body-medium-line-height)] font-medium whitespace-nowrap",

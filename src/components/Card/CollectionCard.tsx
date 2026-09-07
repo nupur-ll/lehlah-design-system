@@ -54,16 +54,23 @@ export default function CollectionCard({
             ))}
           </div>
           <div className="flex w-[210px] shrink-0 flex-col gap-1 self-stretch">
-            <div className="flex w-full items-center gap-1 text-[11px] text-[color:var(--card-text-secondary)]">
+            {/* body/small/500 */}
+            <div className="flex w-full items-center gap-1 text-[length:var(--type-body-small-size)] leading-[var(--type-body-small-line-height)] font-medium text-[color:var(--card-text-secondary)]">
               <span>Created on</span>
               <span>{date}</span>
             </div>
             <div className="flex w-full flex-col gap-0.5">
-              <p className="truncate text-[12px] font-semibold text-[color:var(--card-text-primary)]">{collectionName}</p>
-              <p className="text-[length:var(--type-body-medium-size)] text-[color:var(--card-text-secondary)]">{productQuantity}</p>
+              {/* body/medium/600 */}
+              <p className="truncate text-[length:var(--type-body-medium-size)] leading-[var(--type-body-medium-line-height)] font-semibold text-[color:var(--card-text-primary)]">
+                {collectionName}
+              </p>
+              {/* body/medium/500 */}
+              <p className="text-[length:var(--type-body-medium-size)] leading-[var(--type-body-medium-line-height)] font-medium text-[color:var(--card-text-secondary)]">
+                {productQuantity}
+              </p>
             </div>
             {curatedCollection && (
-              <span className="inline-flex w-fit items-center gap-1 rounded-[var(--notification-corner-radius)] border border-solid border-[var(--notification-border-brand)] bg-[var(--notification-background-tonal-brand)] px-2 py-1 text-[12px] font-semibold text-[color:var(--notification-content-brand)]">
+              <span className="inline-flex w-fit items-center gap-1 rounded-[var(--notification-corner-radius)] border border-solid border-[var(--notification-border-brand)] bg-[var(--notification-background-tonal-brand)] px-2 py-1 text-[length:var(--type-body-medium-size)] leading-[var(--type-body-medium-line-height)] font-semibold text-[color:var(--notification-content-brand)]">
                 Added from Curated Collection
               </span>
             )}

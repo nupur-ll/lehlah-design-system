@@ -47,7 +47,7 @@ const VARIANT: Record<ButtonVariant, string> = {
   filled:
     "bg-[var(--button-color-filled-background)] text-[color:var(--button-color-filled-content)] hover:brightness-110 active:brightness-90",
   outlined:
-    "bg-[var(--button-color-outlined-background)] text-[color:var(--button-color-outlined-content)] border-[1.5px] border-[var(--button-color-outlined-border)] border-solid hover:bg-black/[0.03] active:bg-black/[0.08]",
+    "bg-[var(--button-color-outlined-background)] text-[color:var(--button-color-outlined-content)] border-[length:var(--border-width-thick)] border-[var(--button-color-outlined-border)] border-solid hover:bg-black/[0.03] active:bg-black/[0.08]",
   subtle:
     "bg-[var(--button-color-subtle-background)] text-[color:var(--button-color-subtle-content)] hover:brightness-95 active:brightness-90",
   ghost:

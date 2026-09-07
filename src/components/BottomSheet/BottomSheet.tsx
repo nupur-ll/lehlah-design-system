@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { MagnifyingGlass } from "@phosphor-icons/react";
 import Checkbox from "../Checkbox/Checkbox";
 
 export interface FilterGroup {
@@ -80,7 +81,7 @@ export default function BottomSheet({
         ].join(" ")}
       >
         <div className="flex h-6 w-full items-center justify-center">
-          <div className="h-2 w-[72px] rounded-full bg-[var(--color-grey-70)]" />
+          <div className="h-2 w-[72px] rounded-full bg-[var(--color-grey-400)]" />
         </div>
 
         {showHeader && (
@@ -103,10 +104,11 @@ export default function BottomSheet({
         {showSearch && (
           <div className="w-full px-4 py-3">
             <div className="flex w-full items-center gap-1 rounded-lg border-[1.5px] border-solid border-[var(--input-field-color-border-default)] bg-[var(--input-field-color-surface)] py-3 pl-3 pr-2">
-              <svg viewBox="0 0 24 24" fill="none" className="size-6 shrink-0 text-[color:var(--input-field-color-icon)]" aria-hidden>
-                <circle cx="11" cy="11" r="7" stroke="currentColor" strokeWidth={1.5} />
-                <path d="M21 21l-4-4" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round" />
-              </svg>
+              <MagnifyingGlass
+                weight="regular"
+                className="size-6 shrink-0 text-[color:var(--input-field-color-icon)]"
+                aria-hidden
+              />
               <input
                 placeholder={searchPlaceholder}
                 className="w-full bg-transparent text-[length:var(--type-body-medium-size)] leading-[var(--type-body-medium-line-height)] text-[color:var(--input-field-color-input-text)] outline-none placeholder:text-[color:var(--input-field-color-input-label)]"
