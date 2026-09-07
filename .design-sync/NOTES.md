@@ -8,6 +8,9 @@
   `tsconfig.json` sets `"noEmit": true`.
 - `cfg.buildCmd` compensates with two one-off commands (do NOT rely on `npm run build` for this repo):
   1. A standalone `tsc --declaration --emitDeclarationOnly` pass over `src/components/index.ts`, rooted at
+     <!-- 2026-09-07: this pass now also needs `--types vite/client,react,react-dom` — see
+          "BrandLogo needs vite/client types in the tsc pass" below. -->
+
      `src/components` so `dist/index.d.ts` lands at the top level of `dist/` (required for the converter's
      `findTypesRoot` fallback heuristic to find `dist` as the types root — see `lib/dts.mjs` `hasDts`, which
      only checks the immediate directory, not recursively). This is what makes real prop extraction work at
@@ -125,12 +128,18 @@ against `.design-sync/previews/*.tsx`, which already used `checked`/`onChange` a
   behavior, not a config mistake, and it will just silently strip the props again.
 
 ## Known validate warns (checked every re-sync)
-- `tokens: ... (2 missing, below threshold)` — **benign, not a real gap.** The two names are
-  `--color-green-solid` and `--button`, and both occur only inside CSS *comments* in
-  `src/styles/tokens.css` (one documents a token that was never defined; the other appears in prose
-  describing `bg-[var(--button/color/filled/background,#191919)]`). The validator's reference scan
-  doesn't strip comments. Zero live `var()` references are undefined — re-verified 2026-09-03 by diffing
-  defined-vs-referenced custom properties across `_ds_bundle.css` + `fonts/fonts.css`.
+- `tokens: ... (2 missing, below threshold)` — **benign, not a real gap**, but note the PAIR CHANGED
+  on 2026-09-07. It is now `--color-green-solid` and `--tw-shadow-color`:
+  - `--color-green-solid` — occurs only inside a CSS *comment* in `src/styles/tokens.css` (documents a
+    token that was never defined). The validator's reference scan doesn't strip comments.
+  - `--tw-shadow-color` — **Tailwind's own internal machinery**, not a DS token. Tailwind v3 emits
+    `--tw-shadow-colored: ... var(--tw-shadow-color) ...` rules; `--tw-shadow-color` is only ever set by
+    a `shadow-<color>` utility, and the default `--tw-shadow` path never reads it. Nothing to fix.
+  - `--button` (previously one of the two) **no longer appears at all** — the 2026-09-07 `tokens.css`
+    rewrite removed the prose comment that mentioned it. If a future re-sync reports 2 missing, expect
+    THIS pair; a third name is new and worth checking.
+  Zero live `var()` references are undefined — re-verified 2026-09-07 by diffing defined-vs-referenced
+  custom properties across `_ds_bundle.css` + `fonts/fonts.css`.
 
 ## Component-specific preview-authoring gotchas
 - **AffiliateLinkCard / CollectionCard** — `sales`, `commission`, and `aov` get a "₹" prefix prepended
@@ -143,6 +152,77 @@ against `.design-sync/previews/*.tsx`, which already used `checked`/`onChange` a
   subtext ≲22 chars) or it reads as cut off in the preview. `header`/`subtext`/`cta` are plain passthrough
   props otherwise — no internal formatting.
 - **Notification / Toast** — `headline`/`subtext`/`text` are plain passthrough props, no internal formatting.
+
+## BrandLogo needs `vite/client` types in the tsc pass (added 2026-09-07)
+`BrandLogo` (component #16, added 2026-09-07) is the first component to import non-TS assets:
+`brandLogos.ts` does `import ajio from "../../assets/brand-logos/ajio.png"` × 24, and `BrandLogo.tsx`
+reads `import.meta.env.DEV`. Both rely on Vite's ambient types, which the repo supplies through the
+untracked-then-committed `src/vite-env.d.ts` (`/// <reference types="vite/client" />`).
+**`cfg.buildCmd`'s tsc pass never loads that file** — it passes `src/components/index.ts` as its only
+input, so the `.d.ts` isn't in the program. Result was 25 hard errors:
+- `TS2307: Cannot find module '../../assets/brand-logos/*.png'` × 24
+- `TS2339: Property 'env' does not exist on type 'ImportMeta'` × 1
+
+Fixed by adding **`--types vite/client,react,react-dom`** to the tsc invocation in `cfg.buildCmd`
+(2026-09-07). `--types` injects the ambient declarations globally without adding an input file, which
+matters because `--rootDir src/components` would reject `src/vite-env.d.ts` as being outside the root.
+Do NOT "fix" this instead by adding the file to the input list or widening `rootDir` — widening rootDir
+moves `dist/index.d.ts` down a level and breaks `findTypesRoot` (see "Repo shape" above).
+- Re-sync risk: any future component importing a new asset type (`.svg`, `.json`, `.css?inline`) is
+  covered by `vite/client` already; one importing something Vite doesn't type will need its own
+  declaration reachable from the tsc program.
+
+## BrandLogo: PNG assets inline into the bundle (72 KB → 412 KB)
+The converter's esbuild config (`lib/bundle.mjs`) already maps `.png`/`.svg`/`.woff`/`.woff2` to the
+`dataurl` loader, so the 24 committed brand PNGs (292 KB on disk) inline as base64 data URIs with no
+config needed — nothing extra ships in `_vendor/` or as loose files, and the cards render the real
+artwork. Cost: `_ds_bundle.js` went from 72 KB to **412 KB**. That is fine today but it is now the
+dominant term in bundle size.
+- Re-sync risk: **each new partner logo adds ~1.5-2× its PNG size to every consumer of the bundle.**
+  The registry's own doc comment tells contributors to "drop the PNG in and add one row" — at ~24 logos
+  that's ~340 KB of the bundle; at 100 it would be well over a megabyte. If the set keeps growing,
+  consider serving the artwork rather than inlining it (the `src` field is just a string, so a CDN URL
+  would work unchanged) and re-check the `bundle:` line in the build log.
+- `import.meta.env.DEV` renders safely: the converter's `IIFE_IMPORT_META_DEFINE` (in `lib/common.mjs`)
+  defines `import.meta.env` as `{"MODE":"development","DEV":true,...}` for the IIFE build, so
+  `BrandLogo`'s dev-only sub-48px warning branch compiles and never throws. Without that define the
+  `{}.env.DEV` lookup would crash every BrandLogo render — don't assume Vite-isms are automatically safe,
+  but this specific one is handled upstream.
+
+## BrandLogo grouping + card mode
+- Grouped via a stub like every other non-Card component: `.design-sync/group-stubs/brand/BrandLogo.ts`
+  pinned in `cfg.componentSrcMap` → group **"Brand"**. Its `@category Brand` JSDoc tag is present but,
+  as with all 15 others, is NOT what groups it (see "Grouping" above).
+- `cfg.overrides.BrandLogo = {"cardMode": "column"}` — the `PartnerDirectory` story renders all 24 logos
+  in wrapped category rows and is far wider than a multi-column grid cell.
+- The sibling exports (`BRAND_LOGOS`, `BRAND_LOGO_NAMES`, `BRAND_LOGO_CATEGORY_LABELS`,
+  `brandLogosByCategory`) are correctly NOT picked up as components — none is PascalCase — while still
+  being importable from `window.LehlahDesignSystem` (20 exports for 16 components). The authored preview
+  uses them, which is also how the design agent learns they exist.
+- **An unknown slug throws**: `BRAND_LOGOS[name]` returns `undefined` and the component reads `.src` off
+  it. `conventions.md` now enumerates all 24 valid slugs for exactly this reason.
+
+## conventions.md drift found and corrected (2026-09-07)
+The standing validation pass (base SKILL.md "Author the conventions header" — run on every re-sync,
+never a rewrite) found the header naming **12 tokens that do not exist in the build**:
+- `--button-color-{filled,subtle,ghost,destructive,success,disabled}-border`,
+  `--button-color-ghost-{background,overlay}`, `--button-color-{success,disabled}-overlay` — the header
+  used a brace-cartesian `{7 variants}-{background,content,border,overlay}` (28 names) but only 18 exist;
+  the suffix set genuinely differs per variant, and `ghost` has ONLY `--button-color-ghost-content`.
+- `--type-title-small-{size,line-height}` — there is no `title-small` tier (heading has large/medium/small,
+  title has large/medium only, body has large/medium/small/extra-small).
+Corrected to the real per-variant/per-tier sets, and the families the 2026-09-03 rewrite added but the
+header never documented were filled in: full `none,xs,s,m,l,xl,xxl` scales on `--surface-{spacing,padding,radius}-*`
+plus `--surface-radius-full`, `--surface-effect-drop-shadow-{low,medium,high}-*`, `--border-width-default`,
+`--border-color-{black,grey-light,grey-dark}`, `--icon-size-{xs,s,m,l,xl,xxl}`, and the
+`--type-*-weight-{regular,medium,semibold,bold}` axis. Verified: every token, brand slug and component
+name the header now claims resolves against `_ds_bundle.css` / the `components/` tree.
+- **Why this matters more than a docs nit**: the header is inlined into the design agent's system prompt.
+  A token name that doesn't resolve produces silently unstyled CSS in every design built from it — no
+  error anywhere. Re-run this validation every sync; brace-shorthand families are the trap, because one
+  compact pattern can assert dozens of names nobody checked.
+- Content belongs to its authors — the structure, voice and "do not use the Tailwind theme shorthands"
+  guidance were left as-is; only false or missing names were touched.
 
 ## Not yet in this design system
 - Per `docs/COMPONENTS.md`'s own "Not included" section: **Navbar** (Figma component set exists but no page
@@ -163,6 +243,12 @@ against `.design-sync/previews/*.tsx`, which already used `checked`/`onChange` a
   `10468529-acdc-465b-8c7f-e309e4fa0e84`, likewise named "Design System" — harmless but easy to confuse.
 - Lesson for next time: the generic name "Design System" is ambiguous across this account. The pinned
   project is now explicitly named "LehLah Design System"; keep that name so `list_projects` stays readable.
+- **2026-09-07: pin verified still valid** (`get_project` → "LehLah Design System",
+  `PROJECT_TYPE_DESIGN_SYSTEM`, `canEdit`). Ran as a proper anchored re-sync — the project's
+  `_ds_sync.json` gave 15 verified-by-upload skips, so only the new `BrandLogo` needed capture+grading.
+  This is what the fast path looks like; if a re-sync ever re-verifies all 16 for no obvious reason,
+  suspect the anchor (`anchorReason` in `.sync-diff.json` should read `ok`) or a `scriptsSha` bump from
+  a newer bundled converter.
 
 ## Re-sync risks
 - `cfg.buildCmd`'s two commands must both keep succeeding — if `tsconfig.json` or `tailwind.config.ts` change
@@ -177,6 +263,15 @@ against `.design-sync/previews/*.tsx`, which already used `checked`/`onChange` a
   so nothing extra needs shipping — but the dep must be installed before the converter runs, or the bundle
   step fails to resolve it. If more components adopt Phosphor glyphs, watch the bundle size (72 KB → check
   the `bundle:` line); tree-shaking keeps only the icons actually imported.
+- **The 2026-09-07 component sweep was styling-only — verified, not assumed.** 11 components had
+  hardcoded values swapped for token references (`text-[12px]` → `text-[length:var(--type-body-medium-size)]`,
+  `rounded-xl` → `rounded-[var(--surface-radius-m)]`, `bg-[#333333]` → `bg-[var(--color-grey-900)]`,
+  `--color-grey-70` → `--color-grey-400`, Notification's subtext → `--typography-color-grey-dark`,
+  Pill gained `[&_svg]:size-[var(--icon-size-s)]`, BottomSheet's inline search `<svg>` → Phosphor
+  `MagnifyingGlass`). **No prop signature changed**, so the six hand-written `cfg.dtsPropsFor` bodies
+  stayed valid — re-checked against `git diff src/components/<Name>` per the rule below. The driver
+  correctly classified all 15 as `unchanged` (grades follow the authored `.tsx` + preview-affecting
+  config, not component styling) and the contact sheet confirmed every one still renders styled.
 - The 2026-09-03 `src/styles/tokens.css` rewrite was **purely additive** for anything the conventions header
   names (523 tokens defined now; every family enumerated in `conventions.md` re-verified present). It did
   rename some raw primitives (`--color-grey-70` → `--color-grey-400`) and add new families

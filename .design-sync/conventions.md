@@ -12,12 +12,25 @@ the token by name, drop it straight into a bracket arbitrary value.
 
 Real token families to build with (full catalog: `guidelines/docs/TOKENS.md`, full list: `styles.css`
 custom properties on `:root`):
-- **Buttons**: `--button-color-{filled,outlined,subtle,ghost,destructive,success,disabled}-{background,content,border,overlay}`, `--button-radius-{small,large}`, `--button-padding-{horizontal,vertical}-{small,medium,large}`
-- **Typography**: `--typography-color-{primary,secondary,grey,grey-dark,white}`, `--type-{heading,title,body}-{large,medium,small}-{size,line-height}`
-- **Surface / layout**: `--surface-color-{page,container-white}`, `--surface-spacing-{xs,s}`, `--surface-padding-{s,m}`, `--surface-radius-s`
+- **Buttons**: the suffix set differs per variant — `filled`/`subtle`/`destructive` have
+  `-{background,content,overlay}`, `outlined` has `-{background,content,border,overlay}`,
+  `success`/`disabled` have `-{background,content}`, and `ghost` has **only** `--button-color-ghost-content`.
+  Prefixed `--button-color-<variant>-<suffix>`; there is no `-border` on any variant but `outlined`.
+  Plus `--button-radius-{small,large}`, `--button-padding-{horizontal,vertical}-{small,medium,large}`
+- **Typography**: `--typography-color-{primary,secondary,grey,grey-dark,white}`;
+  `--type-heading-{large,medium,small}-*`, `--type-title-{large,medium}-*` (no `title-small`),
+  `--type-body-{large,medium,small,extra-small}-*` — each tier carrying
+  `-{size,line-height}` and a weight axis `-weight-{regular,medium,semibold,bold}`.
+  Also `--type-letter-spacing`, `--font-name`, `--font-letter-spacing-{none,compressed,relaxed}`
+- **Surface / layout**: `--surface-color-{page,container-white,container-grey,container-grey-light,container-grey-dark,container-black}`;
+  full `none,xs,s,m,l,xl,xxl` scales on `--surface-spacing-*`, `--surface-padding-*` and `--surface-radius-*`
+  (plus `--surface-radius-full`); drop shadows as
+  `--surface-effect-drop-shadow-{low,medium,high}-{position-x,position-y,blur,spread,color}`
 - **Cards**: `--card-{background,border,padding,icon,text-label,text-primary,text-secondary}`, `--card-corner-radius-{card,image,tile}`, `--card-tile-background`
 - **Inputs**: `--input-field-color-{border-default,border-error,border-focused,error-message,surface,input-text,input-label,icon}`, `--input-field-corner-radius`
-- **Selection controls / notifications / borders / icons**: `--selection-control-*`, `--notification-*`, `--border-{color-grey,width-thin,width-thick}`, `--icon-color-{grey,dark,light}`
+- **Selection controls / notifications / borders / icons**: `--selection-control-*`, `--notification-*`,
+  `--border-color-{grey,grey-light,grey-dark,black}`, `--border-width-{thin,default,thick}`,
+  `--icon-color-{grey,dark,light}`, `--icon-size-{xs,s,m,l,xl,xxl}`
 
 ## No provider or root wrapper needed
 
@@ -46,6 +59,24 @@ worth getting right:
     Notify me on new orders
   </span>
 </label>
+```
+
+## `BrandLogo` takes a fixed slug — never invent a brand name
+
+`BrandLogo`'s `name` prop is a closed set of 24 approved partner slugs, and an unknown slug **throws**
+(the component looks the entry up in `BRAND_LOGOS` and reads `.src` off it). Don't guess: the valid slugs
+are `flipkart, myntra, amazon, meesho, ajio, shopsy, snitch, nykaa, nykaa-fashion, tira, plum, foxtale,
+karmic-beauty, soulflower, pilgrim, wishcare, arata, moxie, blinkit, zepto, instamart, pluckk, lenskart,
+underneat` — or read them at runtime from the exported `BRAND_LOGO_NAMES` / `brandLogosByCategory(cat)`
+helpers, with display names in `BRAND_LOGOS[name].label` and section headings in
+`BRAND_LOGO_CATEGORY_LABELS`. Sizes are `size="s"` (48px, compact list rows only) and `size="m"`
+(80px, the default for cards and partner pages); 48px is a hard floor. The logos are image assets, so
+never recolor, filter or distort them — the component already pins aspect ratio and a square footprint.
+
+```tsx
+{brandLogosByCategory("quick-commerce").map((name) => (
+  <BrandLogo key={name} name={name} size="s" />
+))}
 ```
 
 ## Where the truth lives
